@@ -31,7 +31,7 @@ A Python-based code generator for creating Applesoft BASIC programs with HGR (Hi
 Clone or download this repository:
 
 ```bash
-git clone https://github.com/yourusername/Apple-II-HGR-Toolkit.git
+git clone https://github.com/TheDeepLogic/Apple-II-HGR-Toolkit.git
 cd Apple-II-HGR-Toolkit
 ```
 
