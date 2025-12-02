@@ -81,7 +81,7 @@ python hgr-create.py --text "BREAKING NEWS" -scroll -2,0,140 -x 279 -y 12 --boot
 | `-x NUM` | X coordinate (0-279) | 10 for static, 279 for scroll |
 | `-y NUM` | Y coordinate (0-191) | 80 for static, 12 for scroll |
 | `-color NUM` | Color value (0-7) | 3 (white) |
-| `-weight NUM` | Font weight/thickness (1-3) | 1 (single) |
+| `-weight NUM` | Font weight/thickness (1-3) | 2 (double) |
 | `-spacing NUM` | Character spacing in pixels | 6 |
 | `-scroll X,Y,ITER` | Enable scrolling with parameters | None (static) |
 
@@ -259,6 +259,15 @@ Supported characters:
 - **Numbers**: 0-9
 - **Punctuation**: `.` `,` `!` `?` `-` `:` `;` `'` `"` `/` `\` `(` `)`
 - **Space**: ` `
+- **Special Characters**:
+  - **Block Elements**: `▀` (upper half) `▄` (lower half) `█` (full block) `▌` (left half) `▐` (right half)
+  - **Shading**: `░` (light shade) `▒` (medium shade) `▓` (dark shade)
+  - **Shapes**: `■` (black square) `□` (white square) `▪` (small black square) `▫` (small white square) `▬` (horizontal bar)
+  - **Arrows**: `▲` (up) `►` (right) `▼` (down) `◄` (left)
+  - **Symbols**: `◊` (diamond) `○` (circle) `●` (filled circle) `◘` `◙` `◦`
+  - **Emoticons**: `☺` (smiley) `☻` (filled smiley) `☼` (sun)
+  - **Card Suits**: `♥` (heart) `♦` (diamond) `♣` (club) `♠` (spade)
+  - **Box Drawing**: `─` (horizontal) `│` (vertical) `┌` `┐` `└` `┘` (corners) `├` `┤` `┬` `┴` (T-junctions) `┼` (cross) `⌐` (reverse L)
 
 ## Tips & Tricks
 

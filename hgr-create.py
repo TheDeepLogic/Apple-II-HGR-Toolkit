@@ -101,6 +101,51 @@ FONT_5X7 = {
     'x': [0b00000, 0b00000, 0b10001, 0b01010, 0b00100, 0b01010, 0b10001],
     'y': [0b00000, 0b00000, 0b10001, 0b10001, 0b10001, 0b01111, 0b00001, 0b01110],
     'z': [0b00000, 0b00000, 0b11111, 0b00010, 0b00100, 0b01000, 0b11111],
+    # Special characters and symbols
+    '▀': [0b11111, 0b11111, 0b11111, 0b00000, 0b00000, 0b00000, 0b00000],  # Upper half block
+    '▄': [0b00000, 0b00000, 0b00000, 0b00000, 0b11111, 0b11111, 0b11111],  # Lower half block
+    '█': [0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111],  # Full block
+    '▌': [0b11000, 0b11000, 0b11000, 0b11000, 0b11000, 0b11000, 0b11000],  # Left half block
+    '▐': [0b00011, 0b00011, 0b00011, 0b00011, 0b00011, 0b00011, 0b00011],  # Right half block
+    '░': [0b10101, 0b01010, 0b10101, 0b01010, 0b10101, 0b01010, 0b10101],  # Light shade
+    '▒': [0b10101, 0b11011, 0b10101, 0b11011, 0b10101, 0b11011, 0b10101],  # Medium shade
+    '▓': [0b11011, 0b11111, 0b11011, 0b11111, 0b11011, 0b11111, 0b11011],  # Dark shade
+    '■': [0b00000, 0b01110, 0b01110, 0b01110, 0b01110, 0b01110, 0b00000],  # Black square
+    '□': [0b00000, 0b01110, 0b01010, 0b01010, 0b01010, 0b01110, 0b00000],  # White square
+    '▪': [0b00000, 0b00000, 0b00000, 0b01100, 0b01100, 0b00000, 0b00000],  # Small black square
+    '▫': [0b00000, 0b00000, 0b00000, 0b01100, 0b01010, 0b00000, 0b00000],  # Small white square
+    '▬': [0b00000, 0b00000, 0b00000, 0b11111, 0b11111, 0b00000, 0b00000],  # Horizontal bar
+    '▲': [0b00100, 0b01110, 0b10101, 0b10001, 0b10001, 0b10001, 0b11111],  # Up triangle
+    '►': [0b10000, 0b11000, 0b11100, 0b11110, 0b11100, 0b11000, 0b10000],  # Right triangle
+    '▼': [0b11111, 0b10001, 0b10001, 0b10001, 0b10101, 0b01110, 0b00100],  # Down triangle
+    '◄': [0b00001, 0b00011, 0b00111, 0b01111, 0b00111, 0b00011, 0b00001],  # Left triangle
+    '◊': [0b00100, 0b01010, 0b10001, 0b10001, 0b10001, 0b01010, 0b00100],  # Diamond
+    '○': [0b00000, 0b01110, 0b10001, 0b10001, 0b10001, 0b01110, 0b00000],  # Circle
+    '◌': [0b00000, 0b01110, 0b10001, 0b10001, 0b10001, 0b01110, 0b00000],  # Dotted circle (same as circle)
+    '●': [0b00000, 0b01110, 0b11111, 0b11111, 0b11111, 0b01110, 0b00000],  # Filled circle
+    '◘': [0b00000, 0b01110, 0b11111, 0b10101, 0b11111, 0b01110, 0b00000],  # Inverse bullet
+    '◙': [0b00000, 0b01110, 0b10101, 0b11111, 0b10101, 0b01110, 0b00000],  # Inverse white circle
+    '◦': [0b00000, 0b00000, 0b00000, 0b01110, 0b01110, 0b00000, 0b00000],  # White bullet
+    '☺': [0b01110, 0b10001, 0b10101, 0b10001, 0b10101, 0b01010, 0b01110],  # Smiley face
+    '☻': [0b01110, 0b11111, 0b10101, 0b11111, 0b10101, 0b01010, 0b01110],  # Black smiley face
+    '☼': [0b00100, 0b10101, 0b01110, 0b11111, 0b01110, 0b10101, 0b00100],  # Sun
+    '♣': [0b00100, 0b01110, 0b11111, 0b11111, 0b01110, 0b00100, 0b01110],  # Club
+    '♠': [0b00100, 0b01110, 0b11111, 0b11111, 0b01110, 0b00100, 0b01110],  # Spade (similar to club)
+    '♥': [0b01010, 0b11111, 0b11111, 0b11111, 0b01110, 0b00100, 0b00000],  # Heart
+    '♦': [0b00100, 0b01110, 0b11111, 0b11111, 0b01110, 0b00100, 0b00000],  # Diamond
+    # Box-drawing characters
+    '─': [0b00000, 0b00000, 0b00000, 0b11111, 0b00000, 0b00000, 0b00000],  # Horizontal line
+    '│': [0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100],  # Vertical line
+    '┌': [0b00000, 0b00000, 0b00000, 0b00111, 0b00100, 0b00100, 0b00100],  # Top-left corner
+    '┐': [0b00000, 0b00000, 0b00000, 0b11100, 0b00100, 0b00100, 0b00100],  # Top-right corner
+    '└': [0b00100, 0b00100, 0b00100, 0b00111, 0b00000, 0b00000, 0b00000],  # Bottom-left corner
+    '┘': [0b00100, 0b00100, 0b00100, 0b11100, 0b00000, 0b00000, 0b00000],  # Bottom-right corner
+    '├': [0b00100, 0b00100, 0b00100, 0b00111, 0b00100, 0b00100, 0b00100],  # Left T-junction
+    '┤': [0b00100, 0b00100, 0b00100, 0b11100, 0b00100, 0b00100, 0b00100],  # Right T-junction
+    '┬': [0b00000, 0b00000, 0b00000, 0b11111, 0b00100, 0b00100, 0b00100],  # Top T-junction
+    '┴': [0b00100, 0b00100, 0b00100, 0b11111, 0b00000, 0b00000, 0b00000],  # Bottom T-junction
+    '┼': [0b00100, 0b00100, 0b00100, 0b11111, 0b00100, 0b00100, 0b00100],  # Cross
+    '⌐': [0b00000, 0b00000, 0b00000, 0b11111, 0b00100, 0b00100, 0b00100],  # Reverse L (same as top T)
 }
 
 
@@ -203,6 +248,7 @@ def generate_text_effect(text, x=10, y=80, spacing=6, line=1000, inc=1,
         separator = ": " if current_line_text.strip() != f"{current_line}" else ""
         test_line = current_line_text + separator + new_cmd
         
+        # Applesoft BASIC line limit is 239 chars total, use 230 to be safe
         if len(test_line) > 230 and separator:
             lines.append(current_line_text.rstrip(": "))
             current_line += inc
@@ -250,10 +296,10 @@ def generate_scroller(text_line, scroll_params, x, y, spacing=6,
 def print_help():
     """Print DOS-style help."""
     print("""
-╔══════════════════════════════════════════════════════════════════════════╗
-║               APPLE II HGR EFFECTS TOOLKIT v3.0                          ║
-║                   Fast HGR code generation                               ║
-╚══════════════════════════════════════════════════════════════════════════╝
+==============================================================================
+               APPLE II HGR EFFECTS TOOLKIT v3.0
+                   Fast HGR code generation
+==============================================================================
 
 USAGE:
   python hgr.py --text "STRING" [options] --text "STRING" [options] ... [--bootloader]
@@ -297,6 +343,11 @@ EXAMPLES:
 LIMITS:
   X: 0-279 (max 279)    Y: 0-191 (max 191)
   HCOLOR: 0-7           WEIGHT: 1-3
+
+SPECIAL CHARACTERS:
+  Supports blocks, shapes, arrows, symbols, and card suits.
+  Use Unicode symbols in text strings like regular characters.
+  See SPECIAL-CHARACTERS.md for full reference and examples.
 """)
 
 
@@ -502,7 +553,7 @@ def main():
         code += "\n"
     
     if output_file:
-        with open(output_file, 'w') as f:
+        with open(output_file, 'w', encoding='utf-8') as f:
             f.write(code)
         print(f"✓ Code written to {output_file}")
     else:

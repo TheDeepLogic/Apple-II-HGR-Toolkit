@@ -142,6 +142,44 @@ Modify to add delays:
 python hgr-create.py scroll "PROGRAMMING: YOUR NAME" --scroll 0,-1,200 -x 80 -y 191 --bootloader -o credits.bas
 ```
 
+### 18. Special Characters Demo
+
+Using block elements, shapes, and symbols:
+
+```bash
+python hgr-create.py --text "BLOCKS: █▌▐▀▄" -x 10 -y 30 --text "SHADES: ░▒▓" -x 10 -y 50 --text "ARROWS: ▲►▼◄" -x 10 -y 70 --text "CARDS: ♥♦♣♠" -x 10 -y 90 --text "FACES: ☺☻☼" -x 10 -y 110 --bootloader -o symbols-demo.bas
+```
+
+### 19. Game UI with Symbols
+
+Create a game HUD using special characters:
+
+```bash
+python hgr-create.py --text "♥♥♥" -x 10 -y 5 -color 1 --text "SCORE: 1000" -x 50 -y 5 --text "▲ FUEL" -x 200 -y 5 --bootloader
+```
+
+### 20. Progress Bar Effect
+
+Using block characters:
+
+```bash
+python hgr-create.py --text "LOADING: ░░░░░░░░░░" -x 50 -y 90 --bootloader
+```
+
+Then modify to animate by changing to: `█░░░░░░░░░`, `██░░░░░░░░`, etc.
+
+### 21. Box Frame UI
+
+```bash
+python hgr-create.py --text "┌──────────┐" -x 60 -y 40 --text "│  MENU    │" -x 60 -y 60 --text "├──────────┤" -x 60 -y 80 --text "│ START    │" -x 60 -y 100 --text "│ OPTIONS  │" -x 60 -y 120 --text "└──────────┘" -x 60 -y 140 --bootloader
+```
+
+### 22. Card Game Display
+
+```bash
+python hgr-create.py --text "POKER HAND" -x 80 -y 20 --text "10♥ J♥ Q♥ K♥ A♥" -x 50 -y 80 -weight 2 --fill 0 --bootloader
+```
+
 ## Command Line Tips
 
 ### Save All Output
