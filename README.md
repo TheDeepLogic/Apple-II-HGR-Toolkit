@@ -255,7 +255,7 @@ The code will still be generated (with the invalid values) so you can see what y
 ## Font Character Set
 
 Supported characters:
-- **Letters**: A-Z (automatically converted to uppercase)
+- **Letters**: A-Z, a-z
 - **Numbers**: 0-9
 - **Punctuation**: `.` `,` `!` `?` `-` `:` `;` `'` `"` `/` `\` `(` `)`
 - **Space**: ` `
@@ -283,7 +283,6 @@ Supported characters:
 ## Limitations
 
 - Maximum line length handled automatically (splits at ~230 chars)
-- No lowercase text (Apple II typically uppercase only)
 - Monochrome per text block (HGR color fringing applies)
 - Font is fixed 5×7 pixels (scaled by weight parameter)
 - Weight values clamped to 1-3 range
