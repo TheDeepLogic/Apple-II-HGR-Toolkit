@@ -239,7 +239,7 @@ TEXT BLOCK OPTIONS (apply to individual text block):
   -x NUM                  X coordinate (0-279, default: 10 static, 279 scroll)
   -y NUM                  Y coordinate (0-191, default: 80 static, 12 scroll)
   -color NUM              HCOLOR value 0-7 (default: 3=white)
-  -weight NUM             Font weight/thickness (1-3, default: 1)
+  -weight NUM             Font weight/thickness (1-3, default: 2)
   -spacing NUM            Character spacing (default: 6)
   -scroll X,Y,ITER        Make text scroll (e.g., -scroll -2,0,140)
                           X = horiz speed (neg=left)
@@ -315,7 +315,7 @@ def main():
         elif arg == '--text':
             # Parse text block (can be static or scrolling based on -scroll option)
             block = {'type': 'text', 'text': None, 'x': None, 'y': None, 'spacing': 6, 
-                    'hcolor': 3, 'weight': 1, 'scroll': None}
+                    'hcolor': 3, 'weight': 2, 'scroll': None}
             i += 1
             
             # Get text string
