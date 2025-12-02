@@ -101,7 +101,7 @@ python hgr-create.py scroll "DEMO" --scroll -2,-1,100 -x 279 -y 191 --bootloader
 ### Example 5: Custom Colors
 
 ```bash
-python hgr-create.py text "PLAYER 1" -x 50 -y 50 --hcolor 5 text "PLAYER 2" -x 50 -y 100 --hcolor 6 --bootloader
+python hgr-create.py text "PLAYER 1" -x 50 -y 50 --hcolor 3 text "PLAYER 2" -x 50 -y 100 --hcolor 6 --bootloader
 ```
 
 ## Apple II HGR Reference
