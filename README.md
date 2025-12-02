@@ -275,7 +275,7 @@ Supported characters:
 2. **Clean Backgrounds**: Use `--fill 0` for black or `--fill 3` for white backgrounds
 3. **Faster Animation**: Reduce the number of HPLOT commands by increasing character spacing
 4. **Line Length**: BASIC lines are limited to ~238 characters; the tool automatically splits long lines
-5. **Memory**: Each text block uses approximately 500 line numbers; plan your layout accordingly
+5. **Memory**: Each text block uses approximately 50 line numbers; plan your layout accordingly
 6. **Testing**: Use an emulator with paste functionality for rapid iteration
 7. **Optimization**: Omit `--bootloader` if integrating into existing code
 8. **Color Consistency**: Stick to one MSB palette (0-3 or 4-7) to avoid color interference
@@ -285,7 +285,7 @@ Supported characters:
 - Font is rendered as optimized HPLOT commands with horizontal line optimization
 - Weight multiplies both X and Y dimensions of each pixel, creating thicker strokes
 - Scroll effects use DX/DY variables for position offsets, enabling dynamic positioning
-- Line number allocation: 1-100 for bootloader, 1000+ for effect subroutines (500 lines per effect)
+- Line number allocation: 1-100 for bootloader, 50+ for text subroutines
 - Generated code is compatible with Applesoft BASIC on Apple II/II+/IIe/IIc/IIGS
 - CALL 62454 ($F3F2) is the fast HGR clear routine in the Monitor ROM
 
