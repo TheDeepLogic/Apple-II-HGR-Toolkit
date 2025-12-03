@@ -452,13 +452,13 @@ def char_to_hplot(char, x_start, y_start, weight=1, size=1, font_name='default',
         pixels_by_color = {color1: [], color2: []}
         
         for row_idx, row in enumerate(bitmap):
-            for w in range(weight):
-                y = y_start + row_idx * size + w
+            for sy in range(size):
+                y = y_start + (row_idx * size) + sy
                 
                 for col_idx in range(font_width):
                     if row & (1 << (font_width - 1 - col_idx)):
-                        for ww in range(weight):
-                            x = x_start + col_idx * size + ww
+                        for sx in range(size):
+                            x = x_start + (col_idx * size) + sx
                             # Checkerboard pattern: alternate based on x+y position
                             if (x + y) % 2 == 0:
                                 pixels_by_color[color1].append((x, y))
@@ -467,46 +467,52 @@ def char_to_hplot(char, x_start, y_start, weight=1, size=1, font_name='default',
         
         # Generate HPLOT commands for each color
         hplot_commands = []
+        
+        # For dithered colors, use nested loops with DATA statements for maximum efficiency
+        lines_by_y = {}
         for color in [color1, color2]:
-            if not pixels_by_color[color]:
-                continue
+            for x, y in pixels_by_color[color]:
+                if y not in lines_by_y:
+                    lines_by_y[y] = {'x_min': 999, 'x_max': -1}
+                lines_by_y[y]['x_min'] = min(lines_by_y[y]['x_min'], x)
+                lines_by_y[y]['x_max'] = max(lines_by_y[y]['x_max'], x)
+        
+        if not lines_by_y:
+            return []
+        
+        # Generate compact code - one line per Y, but with efficient X loops  
+        hplot_commands.append(f"C1 = {color1}: C2 = {color2}")
+        
+        for y in sorted(lines_by_y.keys()):
+            x_min = lines_by_y[y]['x_min']
+            x_max = lines_by_y[y]['x_max']
             
-            hplot_commands.append(f"HCOLOR = {color}")
-            pixels = sorted(pixels_by_color[color])
+            # Determine starting color for this Y based on checkerboard pattern
+            # The pattern alternates: (x + y) % 2 determines color
+            start_color = 1 if (x_min + y) % 2 == 0 else 2
+            alt_color = 2 if start_color == 1 else 1
+            alt_start = x_min + 1
             
-            i = 0
-            while i < len(pixels):
-                start_x, start_y = pixels[i]
-                end_x, end_y = start_x, start_y
-                
-                # Optimize horizontal lines
-                while i + 1 < len(pixels) and pixels[i + 1] == (end_x + 1, end_y):
-                    i += 1
-                    end_x = pixels[i][0]
-                
-                if start_x == end_x:
-                    hplot_commands.append(f"HPLOT {start_x},{start_y}")
-                else:
-                    hplot_commands.append(f"HPLOT {start_x},{start_y} TO {end_x},{end_y}")
-                
-                i += 1
+            # Plot both color patterns for this row
+            hplot_commands.append(f"C = C{start_color}: HCOLOR = C: FOR X = {x_min} TO {x_max} STEP 2: HPLOT X,{y}: NEXT: C = C{alt_color}: HCOLOR = C: FOR X = {alt_start} TO {x_max} STEP 2: HPLOT X,{y}: NEXT")
         
         return hplot_commands
     
     else:
-        # Solid color - original behavior
+        # Solid color - size and weight fill the character properly
         hplot_commands = []
         
         for row_idx, row in enumerate(bitmap):
-            for w in range(weight):
-                # Size scales the grid, weight adds thickness to each pixel
-                y = y_start + row_idx * size + w
+            # Each bitmap row becomes 'size' rows on screen
+            for sy in range(size):
+                y = y_start + (row_idx * size) + sy
                 pixels = []
                 
                 for col_idx in range(font_width):
                     if row & (1 << (font_width - 1 - col_idx)):
-                        for ww in range(weight):
-                            x = x_start + col_idx * size + ww
+                        # Each bitmap column becomes 'size' columns on screen
+                        for sx in range(size):
+                            x = x_start + (col_idx * size) + sx
                             pixels.append((x, y))
                 
                 if not pixels:

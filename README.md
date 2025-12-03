@@ -224,6 +224,8 @@ Dithered colors use a checkerboard pattern to alternate between two colors, crea
 
 The dithering uses a checkerboard pattern where pixels alternate based on their screen position, creating smooth color blending when viewed from a distance or on a composite monitor.
 
+**Important Dithering Limitations**: Dithered colors generate significantly more code than solid colors. While solid colors can render efficiently using `HPLOT TO` commands, dithered patterns require individual plotting for each alternating pixel. A dithered text block can generate 100-200+ lines of BASIC code (compared to typical 50-line estimates for solid colors), consuming substantially more memory. For large graphics or tight memory constraints, prefer solid colors (0-7) over dithered colors (100-109). Dithering works best for small text or accent elements.
+
 #### Important Color Quirks
 
 1. **MSB Palette Switching**: When MSB=0, pixels use the green/purple palette. When MSB=1, pixels use the orange/blue palette. Drawing in one palette can change colors in the other palette within the same 7-pixel block.
@@ -357,10 +359,11 @@ Supported characters:
 2. **Clean Backgrounds**: Use `--fill 0` for black or `--fill 3` for white backgrounds
 3. **Faster Animation**: Reduce the number of HPLOT commands by increasing character spacing
 4. **Line Length**: BASIC lines are limited to ~238 characters; the tool automatically splits long lines
-5. **Memory**: Each text block uses approximately 50 line numbers; plan your layout accordingly
+5. **Memory**: Each solid-color text block uses approximately 50 line numbers; dithered colors (100-109) can use 100-200+ lines depending on size
 6. **Testing**: Use an emulator with paste functionality for rapid iteration
 7. **Optimization**: Omit `--bootloader` if integrating into existing code
 8. **Color Consistency**: Stick to one MSB palette (0-3 or 4-7) to avoid color interference
+9. **Dithering Memory Cost**: Dithered colors require significantly more memory than solid colors—use them for small decorative elements rather than large graphics
 
 ### Saving and Loading HGR Screens
 
@@ -410,6 +413,7 @@ BLOAD MYGRAPHIC2,A$4000
 - Monochrome per text block (HGR color fringing applies)
 - Font is fixed 5×7 pixels (scaled by weight parameter)
 - Weight values clamped to 1-3 range
+- **Dithered colors (100-109) generate significantly more code**: A typical dithered text block produces 100-200+ lines of BASIC code versus the usual 50 lines for solid colors. This is due to the checkerboard pattern requiring more granular HPLOT statements. Use dithering sparingly for small text or decorative elements where memory permits.
 
 ## Version History
 
