@@ -82,6 +82,7 @@ python hgr-create.py --text "BREAKING NEWS" -scroll -2,0,140 -x 279 -y 12 --boot
 | `-y NUM` | Y coordinate (0-191) | 80 for static, 12 for scroll |
 | `-color NUM` | Color value (0-7) | 3 (white) |
 | `-weight NUM` | Font weight/thickness (1-3) | 2 (double) |
+| `-size NUM` | Text size multiplier (1-5) | 1 (normal) |
 | `-spacing NUM` | Character spacing in pixels | 6 |
 | `-scroll X,Y,ITER` | Enable scrolling with parameters | None (static) |
 
@@ -135,7 +136,13 @@ python hgr-create.py --text "DEMO" -scroll -2,-1,100 -x 279 -y 191 --bootloader
 python hgr-create.py --text "PLAYER 1" -x 50 -y 50 -color 5 -weight 3 --bootloader
 ```
 
-### Example 7: Mixed Static and Scrolling
+### Example 7: Large Title Text
+
+```bash
+python hgr-create.py --text "GAME OVER" -x 40 -y 80 -size 3 -weight 1 --bootloader
+```
+
+### Example 8: Mixed Static and Scrolling
 
 ```bash
 python hgr-create.py --text "TITLE" -x 100 -y 20 -weight 2 --text "NEWS FLASH" -scroll -1,0,200 --bootloader
@@ -183,7 +190,18 @@ The Apple II's Hi-Res graphics mode is unique and somewhat peculiar. Each row of
 
 #### Why Font Weight Helps
 
-The `--weight` option combats NTSC artifacts by creating thicker strokes. When using weight 2 or 3, the doubled/tripled pixels create more solid white regions, reducing color fringing and making text more readable on colored backgrounds. This is why many Apple II programs used double-wide or chunky fonts.
+The `-weight` option combats NTSC artifacts by creating thicker strokes. When using weight 2 or 3, the doubled/tripled pixels create more solid white regions, reducing color fringing and making text more readable on colored backgrounds. This is why many Apple II programs used double-wide or chunky fonts.
+
+#### Text Size Scaling
+
+The `-size` option (values 1-5, default 1) scales the entire character by multiplying both the pixel positions and the font weight. This creates larger text while maintaining proportions:
+- **Size 1**: Normal 5×7 font with specified weight (default)
+- **Size 2**: 10×14 characters (double size)
+- **Size 3**: 15×21 characters (triple size)
+- **Size 4**: 20×28 characters (quadruple size)
+- **Size 5**: 25×35 characters (quintuple size)
+
+Note: Larger sizes may require adjusting spacing to prevent character overlap. The size multiplier affects both the character dimensions and the stroke weight.
 
 ### Practical Color Tips
 
@@ -283,7 +301,8 @@ Supported characters:
 ## Technical Details
 
 - Font is rendered as optimized HPLOT commands with horizontal line optimization
-- Weight multiplies both X and Y dimensions of each pixel, creating thicker strokes
+- Weight multiplies stroke thickness (1=single, 2=double, 3=triple pixel width)
+- Size multiplies both character dimensions and weight for proportional scaling
 - Scroll effects use DX/DY variables for position offsets, enabling dynamic positioning
 - Line number allocation: 1-100 for bootloader, 50+ for text subroutines
 - Generated code is compatible with Applesoft BASIC on Apple II/II+/IIe/IIc/IIGS

@@ -149,8 +149,8 @@ FONT_5X7 = {
 }
 
 
-def char_to_hplot(char, x_start, y_start, weight=1):
-    """Convert a character to HPLOT commands with specified weight."""
+def char_to_hplot(char, x_start, y_start, weight=1, size=1):
+    """Convert a character to HPLOT commands with specified weight and size."""
     # Try to use the character as-is first, then uppercase, then default to space
     if char in FONT_5X7:
         char_to_draw = char
@@ -164,13 +164,14 @@ def char_to_hplot(char, x_start, y_start, weight=1):
     
     for row_idx, row in enumerate(bitmap):
         for w in range(weight):
-            y = y_start + row_idx * weight + w
+            # Size scales the grid, weight adds thickness to each pixel
+            y = y_start + row_idx * size + w
             pixels = []
             
             for col_idx in range(5):
                 if row & (1 << (4 - col_idx)):
                     for ww in range(weight):
-                        x = x_start + col_idx * weight + ww
+                        x = x_start + col_idx * size + ww
                         pixels.append((x, y))
             
             if not pixels:
@@ -195,24 +196,25 @@ def char_to_hplot(char, x_start, y_start, weight=1):
     return hplot_commands
 
 
-def text_to_hplot(text, x_start=10, y_start=80, char_spacing=6, weight=1):
+def text_to_hplot(text, x_start=10, y_start=80, char_spacing=6, weight=1, size=1):
     """Convert text string to HPLOT commands."""
     all_commands = []
     current_x = x_start
     
     for char in text:
-        commands = char_to_hplot(char, current_x, y_start, weight)
+        commands = char_to_hplot(char, current_x, y_start, weight, size)
         all_commands.extend(commands)
-        current_x += char_spacing * weight
+        # Spacing is affected by size, but not weight
+        current_x += char_spacing * size
     
     return all_commands
 
 
 def generate_text_effect(text, x=10, y=80, spacing=6, line=1000, inc=1, 
-                        hcolor=3, use_vars=False, weight=1):
+                        hcolor=3, use_vars=False, weight=1, size=1):
     """Generate text drawing code."""
     hplot_commands = text_to_hplot(text, x if not use_vars else 0, 
-                                   y if not use_vars else 0, spacing, weight)
+                                   y if not use_vars else 0, spacing, weight, size)
     
     lines = []
     current_line = line
@@ -269,7 +271,7 @@ def generate_text_effect(text, x=10, y=80, spacing=6, line=1000, inc=1,
 
 
 def generate_scroller(text_line, scroll_params, x, y, spacing=6, 
-                     line=500, inc=1, hcolor=3, weight=1, text_routine_line=1000):
+                     line=500, inc=1, hcolor=3, weight=1, size=1, text_routine_line=1000):
     """Generate scrolling text code."""
     scroll_x, scroll_y, iterations = scroll_params
     
@@ -288,7 +290,7 @@ def generate_scroller(text_line, scroll_params, x, y, spacing=6,
     lines.append(f"{line+110} RETURN")
     lines.append("")
     
-    text_code = generate_text_effect(text_line, 0, 0, spacing, text_routine_line, inc, hcolor, use_vars=True, weight=weight)
+    text_code = generate_text_effect(text_line, 0, 0, spacing, text_routine_line, inc, hcolor, use_vars=True, weight=weight, size=size)
     
     return "\n".join(lines) + "\n" + text_code
 
@@ -317,6 +319,9 @@ TEXT BLOCK OPTIONS (apply to individual text block):
   -y NUM                  Y coordinate (0-191, default: 80 static, 12 scroll)
   -color NUM              HCOLOR value 0-7 (default: 3=white)
   -weight NUM             Font weight/thickness (1-3, default: 2)
+  -size NUM               Font scale/size (1=normal, 2=2x, 3=3x, default: 2)
+                          Size multiplies character dimensions - size 2 doubles
+                          both width and height. Spacing scales with size.
   -spacing NUM            Character spacing (default: 6)
   -scroll X,Y,ITER        Make text scroll (e.g., -scroll -2,0,140)
                           X = horiz speed (neg=left)
@@ -397,7 +402,7 @@ def main():
         elif arg == '--text':
             # Parse text block (can be static or scrolling based on -scroll option)
             block = {'type': 'text', 'text': None, 'x': None, 'y': None, 'spacing': 6, 
-                    'hcolor': 3, 'weight': 2, 'scroll': None}
+                    'hcolor': 3, 'weight': 2, 'size': 2, 'scroll': None}
             i += 1
             
             # Get text string
@@ -446,6 +451,14 @@ def main():
                             block['weight'] = 3
                     except ValueError:
                         errors.append(f"-weight requires a number, got '{sys.argv[i + 1]}'")
+                    i += 2
+                elif sys.argv[i] == '-size' and i + 1 < len(sys.argv):
+                    try:
+                        block['size'] = int(sys.argv[i + 1])
+                        if block['size'] < 1:
+                            block['size'] = 1
+                    except ValueError:
+                        errors.append(f"-size requires a number, got '{sys.argv[i + 1]}'")
                     i += 2
                 elif sys.argv[i] == '-scroll' and i + 1 < len(sys.argv):
                     block['scroll'] = sys.argv[i + 1]
@@ -517,7 +530,7 @@ def main():
         if block['type'] == 'text':
             code += generate_text_effect(block['text'], block['x'], block['y'],
                                         block['spacing'], current_line, 1,
-                                        block['hcolor'], use_vars=False, weight=block['weight'])
+                                        block['hcolor'], use_vars=False, weight=block['weight'], size=block['size'])
             code += "\n\n"
             current_line += 500
         elif block['type'] == 'scroll':
@@ -536,7 +549,7 @@ def main():
             
             code += generate_scroller(block['text'], scroll_params, block['x'],
                                      block['y'], block['spacing'], scroll_line,
-                                     1, block['hcolor'], weight=block['weight'],
+                                     1, block['hcolor'], weight=block['weight'], size=block['size'],
                                      text_routine_line=current_line)
             code += "\n\n"
             scroll_line += 500
