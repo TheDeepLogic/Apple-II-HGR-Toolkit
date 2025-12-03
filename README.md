@@ -83,6 +83,7 @@ python hgr-create.py --text "BREAKING NEWS" -scroll -2,0,140 -x 279 -y 12 --boot
 | `-color NUM` | Color value (0-7) | 3 (white) |
 | `-weight NUM` | Font weight/thickness (1-3) | 2 (double) |
 | `-size NUM` | Text size multiplier (1-5) | 1 (normal) |
+| `-font NAME` | Font style (default, tiny, bold, bubble) | default |
 | `-spacing NUM` | Character spacing in pixels | 6 |
 | `-scroll X,Y,ITER` | Enable scrolling with parameters | None (static) |
 
@@ -142,7 +143,25 @@ python hgr-create.py --text "PLAYER 1" -x 50 -y 50 -color 5 -weight 3 --bootload
 python hgr-create.py --text "GAME OVER" -x 40 -y 80 -size 3 -weight 1 --bootloader
 ```
 
-### Example 8: Mixed Static and Scrolling
+### Example 8: Tiny Font for Status Display
+
+```bash
+python hgr-create.py --text "SCORE 1000 LIVES 3" -font tiny -x 10 -y 10 -weight 1 --bootloader
+```
+
+### Example 9: Bold Font for Emphasis
+
+```bash
+python hgr-create.py --text "WARNING" -font bold -x 80 -y 90 -color 5 --bootloader
+```
+
+### Example 10: Bubble Font with Size
+
+```bash
+python hgr-create.py --text "HELLO" -font bubble -size 2 -x 60 -y 70 --bootloader
+```
+
+### Example 11: Mixed Static and Scrolling
 
 ```bash
 python hgr-create.py --text "TITLE" -x 100 -y 20 -weight 2 --text "NEWS FLASH" -scroll -1,0,200 --bootloader
@@ -202,6 +221,17 @@ The `-size` option (values 1-5, default 1) scales the entire character by multip
 - **Size 5**: 25×35 characters (quintuple size)
 
 Note: Larger sizes may require adjusting spacing to prevent character overlap. The size multiplier affects both the character dimensions and the stroke weight.
+
+### Font Styles
+
+The toolkit includes four font styles that can be selected with the `-font` option:
+
+- **default**: Standard 5×7 bitmap font with good readability
+- **tiny**: Compact 3×5 font for fitting more text on screen
+- **bold**: 5×7 font with thicker strokes built into the bitmap
+- **bubble**: 5×7 rounded, friendly style font
+
+All fonts support uppercase letters, lowercase letters, numbers, and basic punctuation. Special characters (blocks, arrows, symbols, card suits, box-drawing) automatically use the default font regardless of the font selected, ensuring consistent rendering of these elements across all font styles.
 
 ### Practical Color Tips
 

@@ -22,7 +22,88 @@ COLOR_INFO = {
     7: {"name": "white", "msb": 1, "palette": "both"}
 }
 
-# 5x7 bitmap font
+# 3x5 tiny bitmap font (compact)
+FONT_3X5 = {
+    'A': [0b010, 0b101, 0b111, 0b101, 0b101],
+    'B': [0b110, 0b101, 0b110, 0b101, 0b110],
+    'C': [0b011, 0b100, 0b100, 0b100, 0b011],
+    'D': [0b110, 0b101, 0b101, 0b101, 0b110],
+    'E': [0b111, 0b100, 0b110, 0b100, 0b111],
+    'F': [0b111, 0b100, 0b110, 0b100, 0b100],
+    'G': [0b011, 0b100, 0b101, 0b101, 0b011],
+    'H': [0b101, 0b101, 0b111, 0b101, 0b101],
+    'I': [0b111, 0b010, 0b010, 0b010, 0b111],
+    'J': [0b111, 0b001, 0b001, 0b101, 0b010],
+    'K': [0b101, 0b110, 0b100, 0b110, 0b101],
+    'L': [0b100, 0b100, 0b100, 0b100, 0b111],
+    'M': [0b101, 0b111, 0b101, 0b101, 0b101],
+    'N': [0b101, 0b111, 0b111, 0b111, 0b101],
+    'O': [0b010, 0b101, 0b101, 0b101, 0b010],
+    'P': [0b110, 0b101, 0b110, 0b100, 0b100],
+    'Q': [0b010, 0b101, 0b101, 0b111, 0b011],
+    'R': [0b110, 0b101, 0b110, 0b110, 0b101],
+    'S': [0b011, 0b100, 0b010, 0b001, 0b110],
+    'T': [0b111, 0b010, 0b010, 0b010, 0b010],
+    'U': [0b101, 0b101, 0b101, 0b101, 0b010],
+    'V': [0b101, 0b101, 0b101, 0b101, 0b010],
+    'W': [0b101, 0b101, 0b101, 0b111, 0b101],
+    'X': [0b101, 0b010, 0b010, 0b010, 0b101],
+    'Y': [0b101, 0b101, 0b010, 0b010, 0b010],
+    'Z': [0b111, 0b001, 0b010, 0b100, 0b111],
+    '0': [0b010, 0b101, 0b101, 0b101, 0b010],
+    '1': [0b010, 0b110, 0b010, 0b010, 0b111],
+    '2': [0b110, 0b001, 0b010, 0b100, 0b111],
+    '3': [0b110, 0b001, 0b010, 0b001, 0b110],
+    '4': [0b101, 0b101, 0b111, 0b001, 0b001],
+    '5': [0b111, 0b100, 0b110, 0b001, 0b110],
+    '6': [0b011, 0b100, 0b110, 0b101, 0b010],
+    '7': [0b111, 0b001, 0b010, 0b010, 0b010],
+    '8': [0b010, 0b101, 0b010, 0b101, 0b010],
+    '9': [0b010, 0b101, 0b011, 0b001, 0b110],
+    ' ': [0b000, 0b000, 0b000, 0b000, 0b000],
+    '.': [0b000, 0b000, 0b000, 0b000, 0b010],
+    ',': [0b000, 0b000, 0b000, 0b010, 0b100],
+    '!': [0b010, 0b010, 0b010, 0b000, 0b010],
+    '?': [0b110, 0b001, 0b010, 0b000, 0b010],
+    '-': [0b000, 0b000, 0b111, 0b000, 0b000],
+    ':': [0b000, 0b010, 0b000, 0b010, 0b000],
+    ';': [0b000, 0b010, 0b000, 0b010, 0b100],
+    "'": [0b010, 0b010, 0b000, 0b000, 0b000],
+    '"': [0b101, 0b101, 0b000, 0b000, 0b000],
+    '/': [0b001, 0b010, 0b010, 0b100, 0b100],
+    '\\': [0b100, 0b100, 0b010, 0b010, 0b001],
+    '(': [0b010, 0b100, 0b100, 0b100, 0b010],
+    ')': [0b010, 0b001, 0b001, 0b001, 0b010],
+    # Lowercase
+    'a': [0b000, 0b011, 0b101, 0b101, 0b011],
+    'b': [0b100, 0b110, 0b101, 0b101, 0b110],
+    'c': [0b000, 0b011, 0b100, 0b100, 0b011],
+    'd': [0b001, 0b011, 0b101, 0b101, 0b011],
+    'e': [0b000, 0b010, 0b101, 0b110, 0b011],
+    'f': [0b011, 0b100, 0b110, 0b100, 0b100],
+    'g': [0b000, 0b011, 0b101, 0b011, 0b110],
+    'h': [0b100, 0b110, 0b101, 0b101, 0b101],
+    'i': [0b010, 0b000, 0b010, 0b010, 0b010],
+    'j': [0b001, 0b000, 0b001, 0b001, 0b110],
+    'k': [0b100, 0b101, 0b110, 0b110, 0b101],
+    'l': [0b110, 0b010, 0b010, 0b010, 0b111],
+    'm': [0b000, 0b110, 0b111, 0b101, 0b101],
+    'n': [0b000, 0b110, 0b101, 0b101, 0b101],
+    'o': [0b000, 0b010, 0b101, 0b101, 0b010],
+    'p': [0b000, 0b110, 0b101, 0b110, 0b100],
+    'q': [0b000, 0b011, 0b101, 0b011, 0b001],
+    'r': [0b000, 0b011, 0b100, 0b100, 0b100],
+    's': [0b000, 0b011, 0b010, 0b001, 0b110],
+    't': [0b010, 0b111, 0b010, 0b010, 0b011],
+    'u': [0b000, 0b101, 0b101, 0b101, 0b011],
+    'v': [0b000, 0b101, 0b101, 0b101, 0b010],
+    'w': [0b000, 0b101, 0b101, 0b111, 0b101],
+    'x': [0b000, 0b101, 0b010, 0b010, 0b101],
+    'y': [0b000, 0b101, 0b101, 0b011, 0b110],
+    'z': [0b000, 0b111, 0b010, 0b100, 0b111],
+}
+
+# 5x7 bitmap font (default)
 FONT_5X7 = {
     'A': [0b01110, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001],
     'B': [0b11110, 0b10001, 0b10001, 0b11110, 0b10001, 0b10001, 0b11110],
@@ -148,18 +229,208 @@ FONT_5X7 = {
     '⌐': [0b00000, 0b00000, 0b00000, 0b11111, 0b00100, 0b00100, 0b00100],  # Reverse L (same as top T)
 }
 
+# 5x7 bold font (thicker strokes for better visibility)
+FONT_BOLD = {
+    'A': [0b01110, 0b11111, 0b11011, 0b11111, 0b11011, 0b11011, 0b11011],
+    'B': [0b11110, 0b11011, 0b11011, 0b11110, 0b11011, 0b11011, 0b11110],
+    'C': [0b01111, 0b11011, 0b11000, 0b11000, 0b11000, 0b11011, 0b01111],
+    'D': [0b11110, 0b11011, 0b11011, 0b11011, 0b11011, 0b11011, 0b11110],
+    'E': [0b11111, 0b11000, 0b11000, 0b11110, 0b11000, 0b11000, 0b11111],
+    'F': [0b11111, 0b11000, 0b11000, 0b11110, 0b11000, 0b11000, 0b11000],
+    'G': [0b01111, 0b11011, 0b11000, 0b11011, 0b11011, 0b11011, 0b01111],
+    'H': [0b11011, 0b11011, 0b11011, 0b11111, 0b11011, 0b11011, 0b11011],
+    'I': [0b11111, 0b01110, 0b01110, 0b01110, 0b01110, 0b01110, 0b11111],
+    'J': [0b11111, 0b00110, 0b00110, 0b00110, 0b00110, 0b11110, 0b01100],
+    'K': [0b11011, 0b11110, 0b11100, 0b11100, 0b11100, 0b11110, 0b11011],
+    'L': [0b11000, 0b11000, 0b11000, 0b11000, 0b11000, 0b11000, 0b11111],
+    'M': [0b11011, 0b11111, 0b11111, 0b11111, 0b11011, 0b11011, 0b11011],
+    'N': [0b11011, 0b11111, 0b11111, 0b11111, 0b11111, 0b11011, 0b11011],
+    'O': [0b01110, 0b11011, 0b11011, 0b11011, 0b11011, 0b11011, 0b01110],
+    'P': [0b11110, 0b11011, 0b11011, 0b11110, 0b11000, 0b11000, 0b11000],
+    'Q': [0b01110, 0b11011, 0b11011, 0b11011, 0b11111, 0b11110, 0b01111],
+    'R': [0b11110, 0b11011, 0b11011, 0b11110, 0b11100, 0b11110, 0b11011],
+    'S': [0b01111, 0b11011, 0b11000, 0b01110, 0b00011, 0b11011, 0b11110],
+    'T': [0b11111, 0b01110, 0b01110, 0b01110, 0b01110, 0b01110, 0b01110],
+    'U': [0b11011, 0b11011, 0b11011, 0b11011, 0b11011, 0b11011, 0b01110],
+    'V': [0b11011, 0b11011, 0b11011, 0b11011, 0b11011, 0b11110, 0b01100],
+    'W': [0b11011, 0b11011, 0b11011, 0b11111, 0b11111, 0b11111, 0b11011],
+    'X': [0b11011, 0b11011, 0b01110, 0b01100, 0b01110, 0b11011, 0b11011],
+    'Y': [0b11011, 0b11011, 0b11110, 0b01100, 0b01100, 0b01100, 0b01100],
+    'Z': [0b11111, 0b00011, 0b00110, 0b01100, 0b01100, 0b11000, 0b11111],
+    '0': [0b01110, 0b11011, 0b11011, 0b11111, 0b11011, 0b11011, 0b01110],
+    '1': [0b01100, 0b11100, 0b01100, 0b01100, 0b01100, 0b01100, 0b11111],
+    '2': [0b01110, 0b11011, 0b00011, 0b00110, 0b01100, 0b01100, 0b11111],
+    '3': [0b11111, 0b00110, 0b01100, 0b00110, 0b00011, 0b11011, 0b01110],
+    '4': [0b00110, 0b01110, 0b11110, 0b11110, 0b11111, 0b00110, 0b00110],
+    '5': [0b11111, 0b11000, 0b11110, 0b00011, 0b00011, 0b11011, 0b01110],
+    '6': [0b00110, 0b01100, 0b11000, 0b11110, 0b11011, 0b11011, 0b01110],
+    '7': [0b11111, 0b00011, 0b00110, 0b01100, 0b01100, 0b01100, 0b01100],
+    '8': [0b01110, 0b11011, 0b11011, 0b01110, 0b11011, 0b11011, 0b01110],
+    '9': [0b01110, 0b11011, 0b11011, 0b01111, 0b00011, 0b00110, 0b01100],
+    ' ': [0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000],
+    '.': [0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b01100, 0b01100],
+    ',': [0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b01100, 0b11000],
+    '!': [0b01100, 0b01100, 0b01100, 0b01100, 0b01100, 0b00000, 0b01100],
+    '?': [0b01110, 0b11011, 0b00011, 0b00110, 0b01100, 0b00000, 0b01100],
+    '-': [0b00000, 0b00000, 0b00000, 0b11111, 0b00000, 0b00000, 0b00000],
+    ':': [0b00000, 0b01100, 0b01100, 0b00000, 0b01100, 0b01100, 0b00000],
+    ';': [0b00000, 0b01100, 0b01100, 0b00000, 0b01100, 0b01100, 0b11000],
+    "'": [0b01100, 0b01100, 0b11000, 0b00000, 0b00000, 0b00000, 0b00000],
+    '"': [0b11011, 0b11011, 0b11011, 0b00000, 0b00000, 0b00000, 0b00000],
+    '/': [0b00011, 0b00110, 0b00110, 0b01100, 0b11000, 0b11000, 0b11000],
+    '\\': [0b11000, 0b11000, 0b11000, 0b01100, 0b00110, 0b00110, 0b00011],
+    '(': [0b00110, 0b01100, 0b11000, 0b11000, 0b11000, 0b01100, 0b00110],
+    ')': [0b11000, 0b01100, 0b00110, 0b00110, 0b00110, 0b01100, 0b11000],
+    # Lowercase
+    'a': [0b00000, 0b00000, 0b01110, 0b00011, 0b01111, 0b11011, 0b01111],
+    'b': [0b11000, 0b11000, 0b11110, 0b11011, 0b11011, 0b11011, 0b11110],
+    'c': [0b00000, 0b00000, 0b01111, 0b11000, 0b11000, 0b11011, 0b01111],
+    'd': [0b00011, 0b00011, 0b01111, 0b11011, 0b11011, 0b11011, 0b01111],
+    'e': [0b00000, 0b00000, 0b01110, 0b11011, 0b11111, 0b11000, 0b01111],
+    'f': [0b00111, 0b01111, 0b01100, 0b11110, 0b01100, 0b01100, 0b01100],
+    'g': [0b00000, 0b00000, 0b01111, 0b11011, 0b11011, 0b01111, 0b00011, 0b01110],
+    'h': [0b11000, 0b11000, 0b11110, 0b11011, 0b11011, 0b11011, 0b11011],
+    'i': [0b01100, 0b00000, 0b11100, 0b01100, 0b01100, 0b01100, 0b11111],
+    'j': [0b00110, 0b00000, 0b00110, 0b00110, 0b00110, 0b00110, 0b11110, 0b01100],
+    'k': [0b11000, 0b11000, 0b11011, 0b11110, 0b11100, 0b11110, 0b11011],
+    'l': [0b11100, 0b01100, 0b01100, 0b01100, 0b01100, 0b01100, 0b11111],
+    'm': [0b00000, 0b00000, 0b11110, 0b11111, 0b11111, 0b11111, 0b11011],
+    'n': [0b00000, 0b00000, 0b11110, 0b11011, 0b11011, 0b11011, 0b11011],
+    'o': [0b00000, 0b00000, 0b01110, 0b11011, 0b11011, 0b11011, 0b01110],
+    'p': [0b00000, 0b00000, 0b11110, 0b11011, 0b11011, 0b11110, 0b11000, 0b11000],
+    'q': [0b00000, 0b00000, 0b01111, 0b11011, 0b11011, 0b01111, 0b00011, 0b00011],
+    'r': [0b00000, 0b00000, 0b11110, 0b11111, 0b11000, 0b11000, 0b11000],
+    's': [0b00000, 0b00000, 0b01111, 0b11000, 0b01110, 0b00011, 0b11110],
+    't': [0b01100, 0b01100, 0b11110, 0b01100, 0b01100, 0b01111, 0b00111],
+    'u': [0b00000, 0b00000, 0b11011, 0b11011, 0b11011, 0b11111, 0b01111],
+    'v': [0b00000, 0b00000, 0b11011, 0b11011, 0b11011, 0b11110, 0b01100],
+    'w': [0b00000, 0b00000, 0b11011, 0b11011, 0b11111, 0b11111, 0b01110],
+    'x': [0b00000, 0b00000, 0b11011, 0b01110, 0b01100, 0b01110, 0b11011],
+    'y': [0b00000, 0b00000, 0b11011, 0b11011, 0b11011, 0b01111, 0b00011, 0b01110],
+    'z': [0b00000, 0b00000, 0b11111, 0b00110, 0b01100, 0b11000, 0b11111],
+}
 
-def char_to_hplot(char, x_start, y_start, weight=1, size=1):
-    """Convert a character to HPLOT commands with specified weight and size."""
-    # Try to use the character as-is first, then uppercase, then default to space
-    if char in FONT_5X7:
+# 5x7 bubble font (rounded, friendly style)
+FONT_BUBBLE = {
+    'A': [0b01110, 0b11111, 0b10101, 0b11111, 0b10101, 0b10001, 0b10001],
+    'B': [0b11100, 0b10110, 0b10011, 0b11110, 0b10011, 0b10110, 0b11100],
+    'C': [0b01111, 0b11001, 0b10000, 0b10000, 0b10000, 0b11001, 0b01111],
+    'D': [0b11100, 0b10110, 0b10011, 0b10011, 0b10011, 0b10110, 0b11100],
+    'E': [0b11111, 0b10001, 0b10100, 0b11100, 0b10100, 0b10001, 0b11111],
+    'F': [0b11111, 0b10001, 0b10100, 0b11100, 0b10100, 0b10000, 0b10000],
+    'G': [0b01111, 0b11001, 0b10000, 0b10111, 0b10011, 0b11001, 0b01110],
+    'H': [0b10001, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001],
+    'I': [0b11111, 0b01110, 0b01110, 0b01110, 0b01110, 0b01110, 0b11111],
+    'J': [0b11111, 0b00110, 0b00110, 0b00110, 0b00110, 0b10110, 0b01100],
+    'K': [0b10011, 0b10110, 0b11100, 0b11000, 0b11100, 0b10110, 0b10011],
+    'L': [0b10000, 0b10000, 0b10000, 0b10000, 0b10000, 0b10001, 0b11111],
+    'M': [0b10001, 0b11011, 0b11111, 0b10101, 0b10001, 0b10001, 0b10001],
+    'N': [0b10001, 0b11001, 0b11101, 0b10111, 0b10011, 0b10001, 0b10001],
+    'O': [0b01110, 0b11011, 0b10001, 0b10001, 0b10001, 0b11011, 0b01110],
+    'P': [0b11110, 0b10011, 0b10011, 0b11110, 0b10000, 0b10000, 0b10000],
+    'Q': [0b01110, 0b11011, 0b10001, 0b10001, 0b10101, 0b11011, 0b01111],
+    'R': [0b11110, 0b10011, 0b10011, 0b11110, 0b11100, 0b10110, 0b10011],
+    'S': [0b01111, 0b11001, 0b10000, 0b01110, 0b00001, 0b11001, 0b11110],
+    'T': [0b11111, 0b11111, 0b01110, 0b01110, 0b01110, 0b01110, 0b01110],
+    'U': [0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b11011, 0b01110],
+    'V': [0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01110, 0b01110],
+    'W': [0b10001, 0b10001, 0b10001, 0b10101, 0b11111, 0b11011, 0b10001],
+    'X': [0b10001, 0b11011, 0b01110, 0b01110, 0b01110, 0b11011, 0b10001],
+    'Y': [0b10001, 0b10001, 0b01110, 0b01110, 0b01110, 0b01110, 0b01110],
+    'Z': [0b11111, 0b00011, 0b00110, 0b01110, 0b01100, 0b11000, 0b11111],
+    '0': [0b01110, 0b11011, 0b10111, 0b11111, 0b11101, 0b11011, 0b01110],
+    '1': [0b01110, 0b11110, 0b01110, 0b01110, 0b01110, 0b01110, 0b11111],
+    '2': [0b01110, 0b11011, 0b00011, 0b00110, 0b01110, 0b01100, 0b11111],
+    '3': [0b11111, 0b00110, 0b01110, 0b00110, 0b00011, 0b11011, 0b01110],
+    '4': [0b00110, 0b01110, 0b11110, 0b10110, 0b11111, 0b00110, 0b00110],
+    '5': [0b11111, 0b11000, 0b11110, 0b00011, 0b00011, 0b11011, 0b01110],
+    '6': [0b00111, 0b01110, 0b11000, 0b11110, 0b11011, 0b11011, 0b01110],
+    '7': [0b11111, 0b00011, 0b00110, 0b01110, 0b01100, 0b01100, 0b01100],
+    '8': [0b01110, 0b11011, 0b11011, 0b01110, 0b11011, 0b11011, 0b01110],
+    '9': [0b01110, 0b11011, 0b11011, 0b01111, 0b00011, 0b01110, 0b11100],
+    ' ': [0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000],
+    '.': [0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b01110, 0b01110],
+    ',': [0b00000, 0b00000, 0b00000, 0b00000, 0b01110, 0b01100, 0b11000],
+    '!': [0b01110, 0b01110, 0b01110, 0b01110, 0b01110, 0b00000, 0b01110],
+    '?': [0b01110, 0b11011, 0b00011, 0b00110, 0b01110, 0b00000, 0b01110],
+    '-': [0b00000, 0b00000, 0b00000, 0b11111, 0b00000, 0b00000, 0b00000],
+    ':': [0b00000, 0b01110, 0b01110, 0b00000, 0b01110, 0b01110, 0b00000],
+    ';': [0b00000, 0b01110, 0b01110, 0b00000, 0b01110, 0b01100, 0b11000],
+    "'": [0b01110, 0b01100, 0b11000, 0b00000, 0b00000, 0b00000, 0b00000],
+    '"': [0b11011, 0b11011, 0b11110, 0b00000, 0b00000, 0b00000, 0b00000],
+    '/': [0b00011, 0b00110, 0b00110, 0b01110, 0b01100, 0b11000, 0b11000],
+    '\\': [0b11000, 0b11000, 0b01100, 0b01110, 0b00110, 0b00110, 0b00011],
+    '(': [0b00111, 0b01110, 0b11100, 0b11100, 0b11100, 0b01110, 0b00111],
+    ')': [0b11100, 0b01110, 0b00111, 0b00111, 0b00111, 0b01110, 0b11100],
+    # Lowercase
+    'a': [0b00000, 0b00000, 0b01110, 0b00011, 0b01111, 0b11011, 0b01111],
+    'b': [0b11000, 0b11000, 0b11110, 0b11011, 0b11011, 0b11011, 0b11110],
+    'c': [0b00000, 0b00000, 0b01111, 0b11000, 0b11000, 0b11001, 0b01111],
+    'd': [0b00011, 0b00011, 0b01111, 0b11011, 0b11011, 0b11011, 0b01111],
+    'e': [0b00000, 0b00000, 0b01110, 0b11011, 0b11111, 0b11000, 0b01111],
+    'f': [0b00111, 0b01111, 0b01100, 0b11110, 0b01100, 0b01100, 0b01100],
+    'g': [0b00000, 0b00000, 0b01111, 0b11011, 0b11011, 0b01111, 0b00011, 0b01110],
+    'h': [0b11000, 0b11000, 0b11110, 0b11011, 0b11011, 0b11011, 0b11011],
+    'i': [0b01110, 0b00000, 0b11110, 0b01110, 0b01110, 0b01110, 0b11111],
+    'j': [0b00110, 0b00000, 0b01110, 0b00110, 0b00110, 0b00110, 0b11110, 0b01100],
+    'k': [0b11000, 0b11000, 0b11011, 0b11110, 0b11100, 0b11110, 0b11011],
+    'l': [0b11110, 0b01110, 0b01110, 0b01110, 0b01110, 0b01110, 0b11111],
+    'm': [0b00000, 0b00000, 0b11010, 0b11111, 0b10101, 0b10101, 0b10001],
+    'n': [0b00000, 0b00000, 0b11110, 0b11011, 0b11011, 0b11011, 0b11011],
+    'o': [0b00000, 0b00000, 0b01110, 0b11011, 0b11011, 0b11011, 0b01110],
+    'p': [0b00000, 0b00000, 0b11110, 0b11011, 0b11011, 0b11110, 0b11000, 0b11000],
+    'q': [0b00000, 0b00000, 0b01111, 0b11011, 0b11011, 0b01111, 0b00011, 0b00011],
+    'r': [0b00000, 0b00000, 0b10111, 0b11111, 0b11000, 0b11000, 0b11000],
+    's': [0b00000, 0b00000, 0b01111, 0b11000, 0b01110, 0b00011, 0b11110],
+    't': [0b01100, 0b01100, 0b11110, 0b01100, 0b01100, 0b01111, 0b00111],
+    'u': [0b00000, 0b00000, 0b11011, 0b11011, 0b11011, 0b11111, 0b01111],
+    'v': [0b00000, 0b00000, 0b11011, 0b11011, 0b11011, 0b01110, 0b01110],
+    'w': [0b00000, 0b00000, 0b10001, 0b10101, 0b11111, 0b11111, 0b01110],
+    'x': [0b00000, 0b00000, 0b11011, 0b01110, 0b01110, 0b01110, 0b11011],
+    'y': [0b00000, 0b00000, 0b11011, 0b11011, 0b11011, 0b01111, 0b00011, 0b01110],
+    'z': [0b00000, 0b00000, 0b11111, 0b00110, 0b01110, 0b01100, 0b11111],
+}
+
+# Font registry
+FONTS = {
+    'default': {'font': FONT_5X7, 'width': 5, 'height': 7},
+    'tiny': {'font': FONT_3X5, 'width': 3, 'height': 5},
+    'bold': {'font': FONT_BOLD, 'width': 5, 'height': 7},
+    'bubble': {'font': FONT_BUBBLE, 'width': 5, 'height': 7},
+}
+
+
+def char_to_hplot(char, x_start, y_start, weight=1, size=1, font_name='default'):
+    """Convert a character to HPLOT commands with specified weight, size, and font."""
+    # Get font data
+    if font_name not in FONTS:
+        font_name = 'default'
+    
+    font_data = FONTS[font_name]['font']
+    font_width = FONTS[font_name]['width']
+    font_height = FONTS[font_name]['height']
+    
+    # Try to use the character as-is first, then uppercase
+    # If not found in selected font, fall back to default font for special characters
+    if char in font_data:
         char_to_draw = char
+    elif char.upper() in font_data:
+        char_to_draw = char.upper()
+    elif char in FONT_5X7:
+        # Special character not in selected font - use default font
+        char_to_draw = char
+        font_data = FONT_5X7
+        font_width = 5
+        font_height = 7
     elif char.upper() in FONT_5X7:
         char_to_draw = char.upper()
+        font_data = FONT_5X7
+        font_width = 5
+        font_height = 7
     else:
         char_to_draw = ' '
     
-    bitmap = FONT_5X7[char_to_draw]
+    bitmap = font_data[char_to_draw]
     hplot_commands = []
     
     for row_idx, row in enumerate(bitmap):
@@ -168,8 +439,8 @@ def char_to_hplot(char, x_start, y_start, weight=1, size=1):
             y = y_start + row_idx * size + w
             pixels = []
             
-            for col_idx in range(5):
-                if row & (1 << (4 - col_idx)):
+            for col_idx in range(font_width):
+                if row & (1 << (font_width - 1 - col_idx)):
                     for ww in range(weight):
                         x = x_start + col_idx * size + ww
                         pixels.append((x, y))
@@ -196,13 +467,13 @@ def char_to_hplot(char, x_start, y_start, weight=1, size=1):
     return hplot_commands
 
 
-def text_to_hplot(text, x_start=10, y_start=80, char_spacing=6, weight=1, size=1):
+def text_to_hplot(text, x_start=10, y_start=80, char_spacing=6, weight=1, size=1, font_name='default'):
     """Convert text string to HPLOT commands."""
     all_commands = []
     current_x = x_start
     
     for char in text:
-        commands = char_to_hplot(char, current_x, y_start, weight, size)
+        commands = char_to_hplot(char, current_x, y_start, weight, size, font_name)
         all_commands.extend(commands)
         # Spacing is affected by size, but not weight
         current_x += char_spacing * size
@@ -211,10 +482,10 @@ def text_to_hplot(text, x_start=10, y_start=80, char_spacing=6, weight=1, size=1
 
 
 def generate_text_effect(text, x=10, y=80, spacing=6, line=1000, inc=1, 
-                        hcolor=3, use_vars=False, weight=1, size=1):
+                        hcolor=3, use_vars=False, weight=1, size=1, font_name='default'):
     """Generate text drawing code."""
     hplot_commands = text_to_hplot(text, x if not use_vars else 0, 
-                                   y if not use_vars else 0, spacing, weight, size)
+                                   y if not use_vars else 0, spacing, weight, size, font_name)
     
     lines = []
     current_line = line
@@ -271,7 +542,7 @@ def generate_text_effect(text, x=10, y=80, spacing=6, line=1000, inc=1,
 
 
 def generate_scroller(text_line, scroll_params, x, y, spacing=6, 
-                     line=500, inc=1, hcolor=3, weight=1, size=1, text_routine_line=1000):
+                     line=500, inc=1, hcolor=3, weight=1, size=1, font_name='default', text_routine_line=1000):
     """Generate scrolling text code."""
     scroll_x, scroll_y, iterations = scroll_params
     
@@ -290,7 +561,7 @@ def generate_scroller(text_line, scroll_params, x, y, spacing=6,
     lines.append(f"{line+110} RETURN")
     lines.append("")
     
-    text_code = generate_text_effect(text_line, 0, 0, spacing, text_routine_line, inc, hcolor, use_vars=True, weight=weight, size=size)
+    text_code = generate_text_effect(text_line, 0, 0, spacing, text_routine_line, inc, hcolor, use_vars=True, weight=weight, size=size, font_name=font_name)
     
     return "\n".join(lines) + "\n" + text_code
 
@@ -322,6 +593,7 @@ TEXT BLOCK OPTIONS (apply to individual text block):
   -size NUM               Font scale/size (1=normal, 2=2x, 3=3x, default: 2)
                           Size multiplies character dimensions - size 2 doubles
                           both width and height. Spacing scales with size.
+  -font NAME              Font style: default, tiny, bold, bubble (default: default)
   -spacing NUM            Character spacing (default: 6)
   -scroll X,Y,ITER        Make text scroll (e.g., -scroll -2,0,140)
                           X = horiz speed (neg=left)
@@ -341,6 +613,12 @@ EXAMPLES:
 
   Double-width text with fill:
     python hgr.py --text "HELLO" -weight 2 --fill 0 --bootloader
+
+  Tiny font for compact text:
+    python hgr.py --text "SYSTEM STATUS" -font tiny -weight 1 --bootloader
+
+  Bold font for emphasis:
+    python hgr.py --text "WARNING" -font bold -x 80 -y 80 --bootloader
 
   Mixed static and scrolling:
     python hgr.py --text "TITLE" -x 100 -y 20 -weight 2 --text "SCROLL" -scroll -1,0,200 --bootloader
@@ -402,7 +680,7 @@ def main():
         elif arg == '--text':
             # Parse text block (can be static or scrolling based on -scroll option)
             block = {'type': 'text', 'text': None, 'x': None, 'y': None, 'spacing': 6, 
-                    'hcolor': 3, 'weight': 2, 'size': 2, 'scroll': None}
+                    'hcolor': 3, 'weight': 2, 'size': 2, 'font': 'default', 'scroll': None}
             i += 1
             
             # Get text string
@@ -459,6 +737,14 @@ def main():
                             block['size'] = 1
                     except ValueError:
                         errors.append(f"-size requires a number, got '{sys.argv[i + 1]}'")
+                    i += 2
+                elif sys.argv[i] == '-font' and i + 1 < len(sys.argv):
+                    font_choice = sys.argv[i + 1].lower()
+                    if font_choice in FONTS:
+                        block['font'] = font_choice
+                    else:
+                        errors.append(f"-font '{sys.argv[i + 1]}' not found. Valid: {', '.join(FONTS.keys())}")
+                        block['font'] = 'default'
                     i += 2
                 elif sys.argv[i] == '-scroll' and i + 1 < len(sys.argv):
                     block['scroll'] = sys.argv[i + 1]
@@ -530,7 +816,7 @@ def main():
         if block['type'] == 'text':
             code += generate_text_effect(block['text'], block['x'], block['y'],
                                         block['spacing'], current_line, 1,
-                                        block['hcolor'], use_vars=False, weight=block['weight'], size=block['size'])
+                                        block['hcolor'], use_vars=False, weight=block['weight'], size=block['size'], font_name=block['font'])
             code += "\n\n"
             current_line += 500
         elif block['type'] == 'scroll':
@@ -550,7 +836,7 @@ def main():
             code += generate_scroller(block['text'], scroll_params, block['x'],
                                      block['y'], block['spacing'], scroll_line,
                                      1, block['hcolor'], weight=block['weight'], size=block['size'],
-                                     text_routine_line=current_line)
+                                     font_name=block['font'], text_routine_line=current_line)
             code += "\n\n"
             scroll_line += 500
             current_line += 500
