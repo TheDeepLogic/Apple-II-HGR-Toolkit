@@ -19,7 +19,18 @@ COLOR_INFO = {
     4: {"name": "black", "msb": 1, "palette": "orange/blue"},
     5: {"name": "orange", "msb": 1, "palette": "orange/blue"},
     6: {"name": "blue", "msb": 1, "palette": "orange/blue"},
-    7: {"name": "white", "msb": 1, "palette": "both"}
+    7: {"name": "white", "msb": 1, "palette": "both"},
+    # Dithered colors (100+ range)
+    100: {"name": "yellow (white+orange dither)", "colors": [7, 5], "pattern": "checkerboard"},
+    101: {"name": "light blue (white+blue dither)", "colors": [7, 6], "pattern": "checkerboard"},
+    102: {"name": "light green (white+green dither)", "colors": [3, 1], "pattern": "checkerboard"},
+    103: {"name": "light purple (white+purple dither)", "colors": [3, 2], "pattern": "checkerboard"},
+    104: {"name": "brown (orange+black dither)", "colors": [5, 0], "pattern": "checkerboard"},
+    105: {"name": "gray (white+black dither)", "colors": [3, 0], "pattern": "checkerboard"},
+    106: {"name": "pink (white+purple dither)", "colors": [7, 2], "pattern": "checkerboard"},
+    107: {"name": "aqua (white+blue dither)", "colors": [3, 6], "pattern": "checkerboard"},
+    108: {"name": "lime (white+green dither)", "colors": [7, 1], "pattern": "checkerboard"},
+    109: {"name": "tan (orange+white dither)", "colors": [5, 3], "pattern": "checkerboard"},
 }
 
 # 3x5 tiny bitmap font (compact)
@@ -400,8 +411,8 @@ FONTS = {
 }
 
 
-def char_to_hplot(char, x_start, y_start, weight=1, size=1, font_name='default'):
-    """Convert a character to HPLOT commands with specified weight, size, and font."""
+def char_to_hplot(char, x_start, y_start, weight=1, size=1, font_name='default', hcolor=3):
+    """Convert a character to HPLOT commands with specified weight, size, font, and color (including dithered colors)."""
     # Get font data
     if font_name not in FONTS:
         font_name = 'default'
@@ -431,29 +442,45 @@ def char_to_hplot(char, x_start, y_start, weight=1, size=1, font_name='default')
         char_to_draw = ' '
     
     bitmap = font_data[char_to_draw]
-    hplot_commands = []
     
-    for row_idx, row in enumerate(bitmap):
-        for w in range(weight):
-            # Size scales the grid, weight adds thickness to each pixel
-            y = y_start + row_idx * size + w
-            pixels = []
-            
-            for col_idx in range(font_width):
-                if row & (1 << (font_width - 1 - col_idx)):
-                    for ww in range(weight):
-                        x = x_start + col_idx * size + ww
-                        pixels.append((x, y))
-            
-            if not pixels:
-                continue
+    # Check if this is a dithered color
+    is_dithered = hcolor >= 100 and hcolor in COLOR_INFO
+    
+    if is_dithered:
+        # Dithered color - need to track pixels by color
+        color1, color2 = COLOR_INFO[hcolor]["colors"]
+        pixels_by_color = {color1: [], color2: []}
+        
+        for row_idx, row in enumerate(bitmap):
+            for w in range(weight):
+                y = y_start + row_idx * size + w
                 
+                for col_idx in range(font_width):
+                    if row & (1 << (font_width - 1 - col_idx)):
+                        for ww in range(weight):
+                            x = x_start + col_idx * size + ww
+                            # Checkerboard pattern: alternate based on x+y position
+                            if (x + y) % 2 == 0:
+                                pixels_by_color[color1].append((x, y))
+                            else:
+                                pixels_by_color[color2].append((x, y))
+        
+        # Generate HPLOT commands for each color
+        hplot_commands = []
+        for color in [color1, color2]:
+            if not pixels_by_color[color]:
+                continue
+            
+            hplot_commands.append(f"HCOLOR = {color}")
+            pixels = sorted(pixels_by_color[color])
+            
             i = 0
             while i < len(pixels):
                 start_x, start_y = pixels[i]
                 end_x, end_y = start_x, start_y
                 
-                while i + 1 < len(pixels) and pixels[i + 1][0] == end_x + 1:
+                # Optimize horizontal lines
+                while i + 1 < len(pixels) and pixels[i + 1] == (end_x + 1, end_y):
                     i += 1
                     end_x = pixels[i][0]
                 
@@ -463,17 +490,54 @@ def char_to_hplot(char, x_start, y_start, weight=1, size=1, font_name='default')
                     hplot_commands.append(f"HPLOT {start_x},{start_y} TO {end_x},{end_y}")
                 
                 i += 1
+        
+        return hplot_commands
     
-    return hplot_commands
+    else:
+        # Solid color - original behavior
+        hplot_commands = []
+        
+        for row_idx, row in enumerate(bitmap):
+            for w in range(weight):
+                # Size scales the grid, weight adds thickness to each pixel
+                y = y_start + row_idx * size + w
+                pixels = []
+                
+                for col_idx in range(font_width):
+                    if row & (1 << (font_width - 1 - col_idx)):
+                        for ww in range(weight):
+                            x = x_start + col_idx * size + ww
+                            pixels.append((x, y))
+                
+                if not pixels:
+                    continue
+                    
+                i = 0
+                while i < len(pixels):
+                    start_x, start_y = pixels[i]
+                    end_x, end_y = start_x, start_y
+                    
+                    while i + 1 < len(pixels) and pixels[i + 1][0] == end_x + 1:
+                        i += 1
+                        end_x = pixels[i][0]
+                    
+                    if start_x == end_x:
+                        hplot_commands.append(f"HPLOT {start_x},{start_y}")
+                    else:
+                        hplot_commands.append(f"HPLOT {start_x},{start_y} TO {end_x},{end_y}")
+                    
+                    i += 1
+        
+        return hplot_commands
 
 
-def text_to_hplot(text, x_start=10, y_start=80, char_spacing=6, weight=1, size=1, font_name='default'):
+def text_to_hplot(text, x_start=10, y_start=80, char_spacing=6, weight=1, size=1, font_name='default', hcolor=3):
     """Convert text string to HPLOT commands."""
     all_commands = []
     current_x = x_start
     
     for char in text:
-        commands = char_to_hplot(char, current_x, y_start, weight, size, font_name)
+        commands = char_to_hplot(char, current_x, y_start, weight, size, font_name, hcolor)
         all_commands.extend(commands)
         # Spacing is affected by size, but not weight
         current_x += char_spacing * size
@@ -485,7 +549,7 @@ def generate_text_effect(text, x=10, y=80, spacing=6, line=1000, inc=1,
                         hcolor=3, use_vars=False, weight=1, size=1, font_name='default'):
     """Generate text drawing code."""
     hplot_commands = text_to_hplot(text, x if not use_vars else 0, 
-                                   y if not use_vars else 0, spacing, weight, size, font_name)
+                                   y if not use_vars else 0, spacing, weight, size, font_name, hcolor)
     
     lines = []
     current_line = line
@@ -500,13 +564,16 @@ def generate_text_effect(text, x=10, y=80, spacing=6, line=1000, inc=1,
         lines.append(f"{current_line} REM ** AT X={x}, Y={y} **")
         current_line += inc
     
-    lines.append(f"{current_line} HCOLOR = {hcolor}")
-    current_line += inc
+    # For dithered colors, HCOLOR commands are inline with the plot commands
+    # For solid colors, set HCOLOR once at the beginning
+    if hcolor < 100:
+        lines.append(f"{current_line} HCOLOR = {hcolor}")
+        current_line += inc
     
     current_line_text = f"{current_line} "
     
     for cmd in hplot_commands:
-        if use_vars:
+        if use_vars and not cmd.startswith("HCOLOR"):
             if " TO " in cmd:
                 parts = cmd.replace("HPLOT ", "").split(" TO ")
                 x1, y1 = parts[0].split(",")
@@ -589,6 +656,10 @@ TEXT BLOCK OPTIONS (apply to individual text block):
   -x NUM                  X coordinate (0-279, default: 10 static, 279 scroll)
   -y NUM                  Y coordinate (0-191, default: 80 static, 12 scroll)
   -color NUM              HCOLOR value 0-7 (default: 3=white)
+                          Dithered colors (100+):
+                            100=yellow, 101=light blue, 102=light green,
+                            103=light purple, 104=brown, 105=gray, 106=pink,
+                            107=aqua, 108=lime, 109=tan
   -weight NUM             Font weight/thickness (1-3, default: 2)
   -size NUM               Font scale/size (1=normal, 2=2x, 3=3x, default: 2)
                           Size multiplies character dimensions - size 2 doubles
@@ -619,6 +690,9 @@ EXAMPLES:
 
   Bold font for emphasis:
     python hgr.py --text "WARNING" -font bold -x 80 -y 80 --bootloader
+
+  Yellow text with dithering:
+    python hgr.py --text "LEMON" -color 100 -x 80 -y 80 --bootloader
 
   Mixed static and scrolling:
     python hgr.py --text "TITLE" -x 100 -y 20 -weight 2 --text "SCROLL" -scroll -1,0,200 --bootloader
@@ -715,10 +789,11 @@ def main():
                 elif sys.argv[i] in ['-color', '-hcolor'] and i + 1 < len(sys.argv):
                     try:
                         block['hcolor'] = int(sys.argv[i + 1])
-                        if block['hcolor'] < 0 or block['hcolor'] > 7:
-                            errors.append(f"HCOLOR {block['hcolor']} out of range (0-7)")
+                        # Allow 0-7 for solid colors, 100-109 for dithered colors
+                        if block['hcolor'] < 0 or (block['hcolor'] > 7 and block['hcolor'] < 100) or block['hcolor'] > 109:
+                            errors.append(f"HCOLOR {block['hcolor']} out of range (0-7 or 100-109 for dithered)")
                     except ValueError:
-                        errors.append(f"-color requires a number 0-7, got '{sys.argv[i + 1]}'")
+                        errors.append(f"-color requires a number (0-7 or 100-109), got '{sys.argv[i + 1]}'")
                     i += 2
                 elif sys.argv[i] == '-weight' and i + 1 < len(sys.argv):
                     try:
@@ -867,8 +942,7 @@ def main():
         if fill_color is not None:
             unique_colors.add(fill_color)
         for block in text_blocks:
-            if 0 <= block['hcolor'] <= 7:  # Only add valid colors
-                unique_colors.add(block['hcolor'])
+            unique_colors.add(block['hcolor'])
         
         if unique_colors:
             print()
@@ -876,11 +950,18 @@ def main():
             print("=" * 70)
             print("Colors used in this program:")
             for color in sorted(unique_colors):
-                info = COLOR_INFO[color]
-                print(f"  HCOLOR {color}: {info['name'].upper()} (MSB={info['msb']}, {info['palette']} palette)")
+                if color in COLOR_INFO:
+                    info = COLOR_INFO[color]
+                    if color >= 100:
+                        # Dithered color
+                        print(f"  COLOR {color}: {info['name'].upper()}")
+                    else:
+                        # Solid color
+                        print(f"  HCOLOR {color}: {info['name'].upper()} (MSB={info['msb']}, {info['palette']} palette)")
             print()
             print("MSB=0 colors (0-3): Green/Purple palette")
             print("MSB=1 colors (4-7): Orange/Blue palette")
+            print("Dithered colors (100+): Checkerboard pattern mixing two colors")
             print()
             print("Note: Mixing colors from different MSB palettes can cause color")
             print("shifts due to the high bit affecting 7-pixel blocks.")

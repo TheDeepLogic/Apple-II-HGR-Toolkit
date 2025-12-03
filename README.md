@@ -12,12 +12,14 @@ A Python-based code generator for creating Applesoft BASIC programs with HGR (Hi
 
 ## Features
 
-- **Bitmap Text Rendering**: Generates optimized HPLOT commands from a built-in 5x7 pixel font
+- **Bitmap Text Rendering**: Generates optimized HPLOT commands from built-in fonts
+- **Multiple Font Styles**: Choose from default, tiny, bold, or bubble fonts
 - **Multiple Text Blocks**: Create multiple text elements at different positions with a single command
 - **Scrolling Text**: Animated scrolling effects with configurable speed and direction
+- **Dithered Colors**: Create additional colors (yellow, pink, lime, gray, etc.) using checkerboard dithering
 - **Font Weight Control**: Single, double, or triple width strokes to combat NTSC artifacts
 - **Screen Fill**: Optional screen clearing with specified background color
-- **Configurable Colors**: Full HCOLOR support (0-7) with palette information
+- **Configurable Colors**: Full HCOLOR support (0-7) plus dithered colors (100-109)
 - **Input Validation**: Automatic bounds checking with warnings for out-of-range coordinates
 - **Bootloader Generation**: Optional automatic setup code (HGR initialization, GOSUB calls, END)
 
@@ -80,7 +82,7 @@ python hgr-create.py --text "BREAKING NEWS" -scroll -2,0,140 -x 279 -y 12 --boot
 |--------|-------------|---------|
 | `-x NUM` | X coordinate (0-279) | 10 for static, 279 for scroll |
 | `-y NUM` | Y coordinate (0-191) | 80 for static, 12 for scroll |
-| `-color NUM` | Color value (0-7) | 3 (white) |
+| `-color NUM` | Color value: 0-7 (solid), 100-109 (dithered) | 3 (white) |
 | `-weight NUM` | Font weight/thickness (1-3) | 2 (double) |
 | `-size NUM` | Text size multiplier (1-5) | 1 (normal) |
 | `-font NAME` | Font style (default, tiny, bold, bubble) | default |
@@ -161,7 +163,19 @@ python hgr-create.py --text "WARNING" -font bold -x 80 -y 90 -color 5 --bootload
 python hgr-create.py --text "HELLO" -font bubble -size 2 -x 60 -y 70 --bootloader
 ```
 
-### Example 11: Mixed Static and Scrolling
+### Example 11: Yellow Lemon with Dithering
+
+```bash
+python hgr-create.py --text "LEMON" -color 100 -x 80 -y 80 -size 2 --bootloader
+```
+
+### Example 12: Multiple Dithered Colors
+
+```bash
+python hgr-create.py --text "YELLOW" -color 100 -x 10 -y 10 --text "PINK" -color 106 -x 10 -y 30 --text "LIME" -color 108 -x 10 -y 50 --bootloader
+```
+
+### Example 13: Mixed Static and Scrolling
 
 ```bash
 python hgr-create.py --text "TITLE" -x 100 -y 20 -weight 2 --text "NEWS FLASH" -scroll -1,0,200 --bootloader
@@ -178,7 +192,7 @@ python hgr-create.py --text "TITLE" -x 100 -y 20 -weight 2 --text "NEWS FLASH" -
 
 The Apple II's Hi-Res graphics mode is unique and somewhat peculiar. Each row of 280 pixels is divided into 40 blocks of 7 pixels, with the **most significant bit (MSB)** of each byte controlling which color palette is used for that block.
 
-#### HCOLOR Values and MSB Palettes
+#### Solid HCOLOR Values and MSB Palettes
 
 | Value | Color Name | MSB | Palette | Pixel Pair | YIQ Values |
 |-------|-----------|-----|---------|------------|-----------|
@@ -190,6 +204,25 @@ The Apple II's Hi-Res graphics mode is unique and somewhat peculiar. Each row of
 | 5 | Orange | 1 | Orange/Blue | 01 | Y:0.5, I:1.0, Q:-1.0 |
 | 6 | Blue | 1 | Orange/Blue | 10 | Y:0.5, I:-1.0, Q:1.0 |
 | 7 | White | 1 | Both | 11 | Y:1.0, I:0.0, Q:0.0 |
+
+#### Dithered Colors (100-109)
+
+Dithered colors use a checkerboard pattern to alternate between two colors, creating the illusion of a third color:
+
+| Value | Color Name | Pattern Colors | Visual Effect |
+|-------|------------|----------------|---------------|
+| 100 | Yellow | White + Orange | Bright yellow tone |
+| 101 | Light Blue | White + Blue | Sky blue |
+| 102 | Light Green | White + Green | Pale green |
+| 103 | Light Purple | White + Purple | Lavender |
+| 104 | Brown | Orange + Black | Dark brown |
+| 105 | Gray | White + Black | Medium gray |
+| 106 | Pink | White + Purple | Light pink |
+| 107 | Aqua | White + Blue | Cyan/aqua |
+| 108 | Lime | White + Green | Bright lime |
+| 109 | Tan | Orange + White | Light tan |
+
+The dithering uses a checkerboard pattern where pixels alternate based on their screen position, creating smooth color blending when viewed from a distance or on a composite monitor.
 
 #### Important Color Quirks
 
