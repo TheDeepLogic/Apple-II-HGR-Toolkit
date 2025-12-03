@@ -270,7 +270,8 @@ All fonts support uppercase letters, lowercase letters, numbers, and basic punct
 
 - **Safest Approach**: Use HCOLOR 3 or 7 (white) on black backgrounds (--fill 0)
 - **Same Palette**: Stick to colors from the same MSB palette (0-3 OR 4-7)
-- **Use Weight**: For colored text on colored backgrounds, use `--weight 2` or `--weight 3`
+- **Use Weight**: For colored text on colored backgrounds, use `-weight 2` or `-weight 3`
+- **Dithering for More Colors**: Use dithered colors (100-109) to create yellow, pink, lime, gray, and other tones
 - **Test First**: Always test your color combinations in an emulator before finalizing
 
 ### Technical Details: The 64:1 Interleave
@@ -352,7 +353,7 @@ Supported characters:
 
 ## Tips & Tricks
 
-1. **Readable Colored Text**: Use `--weight 2` or higher to reduce NTSC artifacts
+1. **Readable Colored Text**: Use `-weight 2` or higher to reduce NTSC artifacts
 2. **Clean Backgrounds**: Use `--fill 0` for black or `--fill 3` for white backgrounds
 3. **Faster Animation**: Reduce the number of HPLOT commands by increasing character spacing
 4. **Line Length**: BASIC lines are limited to ~238 characters; the tool automatically splits long lines
@@ -360,6 +361,38 @@ Supported characters:
 6. **Testing**: Use an emulator with paste functionality for rapid iteration
 7. **Optimization**: Omit `--bootloader` if integrating into existing code
 8. **Color Consistency**: Stick to one MSB palette (0-3 or 4-7) to avoid color interference
+
+### Saving and Loading HGR Screens
+
+The generated BASIC programs can use significant memory. Once you've run your program and created the graphics screen, you can save just the graphics buffer as a binary file and load it instantly without re-executing the BASIC code:
+
+**To save the current HGR screen:**
+```basic
+BSAVE MYGRAPHIC,A$2000,L$2000
+```
+
+This saves 8KB (8192 bytes = $2000 hex) starting at memory address $2000 (8192 decimal), which is where HGR Page 1 resides.
+
+**To load a saved HGR screen:**
+```basic
+HGR : BLOAD MYGRAPHIC,A$2000
+```
+
+The `HGR` command switches to Hi-Res graphics mode, then `BLOAD` loads the binary data directly into the graphics memory.
+
+**Why this is useful:**
+- **Memory savings**: The BASIC program with all the HPLOT commands can be 10-20KB or more, but the final screen is always exactly 8KB
+- **Instant display**: Loading a binary screen file is nearly instantaneous compared to executing hundreds of HPLOT commands
+- **Title screens**: Perfect for game title screens or splash screens that don't need to be regenerated
+- **Disk space**: Save multiple screen variants and load them as needed
+
+**HGR Page 2 (if using second page):**
+```basic
+BSAVE MYGRAPHIC2,A$4000,L$2000
+BLOAD MYGRAPHIC2,A$4000
+```
+
+**Pro tip**: After generating your graphics with this toolkit, run the program once, verify it looks correct, save it with BSAVE, then you can delete the large BASIC program and just keep the small 8KB binary file!
 
 ## Technical Details
 
