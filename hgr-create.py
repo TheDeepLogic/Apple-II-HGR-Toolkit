@@ -10,8 +10,8 @@ import random
 
 VERSION = "3.0.0"
 
-# Color palette information
-COLOR_INFO = {
+# HGR Color palette information
+HGR_COLOR_INFO = {
     0: {"name": "black", "msb": 0, "palette": "green/purple"},
     1: {"name": "green", "msb": 0, "palette": "green/purple"},
     2: {"name": "purple", "msb": 0, "palette": "green/purple"},
@@ -32,6 +32,29 @@ COLOR_INFO = {
     108: {"name": "lime (white+green dither)", "colors": [7, 1], "pattern": "checkerboard"},
     109: {"name": "tan (orange+white dither)", "colors": [5, 3], "pattern": "checkerboard"},
 }
+
+# GR Color palette information (Low-Resolution Graphics)
+GR_COLOR_INFO = {
+    0: {"name": "black"},
+    1: {"name": "magenta"},
+    2: {"name": "dark blue"},
+    3: {"name": "purple"},
+    4: {"name": "dark green"},
+    5: {"name": "gray 1"},
+    6: {"name": "medium blue"},
+    7: {"name": "light blue"},
+    8: {"name": "brown"},
+    9: {"name": "orange"},
+    10: {"name": "gray 2"},
+    11: {"name": "pink"},
+    12: {"name": "light green"},
+    13: {"name": "yellow"},
+    14: {"name": "aqua"},
+    15: {"name": "white"},
+}
+
+# Legacy reference for backward compatibility
+COLOR_INFO = HGR_COLOR_INFO
 
 # 3x5 tiny bitmap font (compact)
 FONT_3X5 = {
@@ -411,7 +434,7 @@ FONTS = {
 }
 
 
-def char_to_hplot(char, x_start, y_start, weight=1, size=1, font_name='default', hcolor=3):
+def char_to_hplot(char, x_start, y_start, weight=1, size=1, font_name='default', hcolor=3, gr_mode=False):
     """Convert a character to HPLOT commands with specified weight, size, font, and color (including dithered colors)."""
     # Get font data
     if font_name not in FONTS:
@@ -443,12 +466,12 @@ def char_to_hplot(char, x_start, y_start, weight=1, size=1, font_name='default',
     
     bitmap = font_data[char_to_draw]
     
-    # Check if this is a dithered color
-    is_dithered = hcolor >= 100 and hcolor in COLOR_INFO
+    # GR mode doesn't support dithered colors
+    is_dithered = not gr_mode and hcolor >= 100 and hcolor in HGR_COLOR_INFO
     
     if is_dithered:
         # Dithered color - need to track pixels by color
-        color1, color2 = COLOR_INFO[hcolor]["colors"]
+        color1, color2 = HGR_COLOR_INFO[hcolor]["colors"]
         pixels_by_color = {color1: [], color2: []}
         
         for row_idx, row in enumerate(bitmap):
@@ -527,23 +550,34 @@ def char_to_hplot(char, x_start, y_start, weight=1, size=1, font_name='default',
                         i += 1
                         end_x = pixels[i][0]
                     
-                    if start_x == end_x:
-                        hplot_commands.append(f"HPLOT {start_x},{start_y}")
+                    if gr_mode:
+                        # GR mode uses PLOT instead of HPLOT
+                        # In GR mode, we plot blocks directly
+                        if start_x == end_x:
+                            hplot_commands.append(f"PLOT {start_x},{start_y}")
+                        else:
+                            # GR has no "TO" syntax, must plot individually or use loops
+                            for px in range(start_x, end_x + 1):
+                                hplot_commands.append(f"PLOT {px},{start_y}")
                     else:
-                        hplot_commands.append(f"HPLOT {start_x},{start_y} TO {end_x},{end_y}")
+                        # HGR mode uses HPLOT
+                        if start_x == end_x:
+                            hplot_commands.append(f"HPLOT {start_x},{start_y}")
+                        else:
+                            hplot_commands.append(f"HPLOT {start_x},{start_y} TO {end_x},{end_y}")
                     
                     i += 1
         
         return hplot_commands
 
 
-def text_to_hplot(text, x_start=10, y_start=80, char_spacing=6, weight=1, size=1, font_name='default', hcolor=3):
-    """Convert text string to HPLOT commands."""
+def text_to_hplot(text, x_start=10, y_start=80, char_spacing=6, weight=1, size=1, font_name='default', hcolor=3, gr_mode=False):
+    """Convert text string to HPLOT/PLOT commands."""
     all_commands = []
     current_x = x_start
     
     for char in text:
-        commands = char_to_hplot(char, current_x, y_start, weight, size, font_name, hcolor)
+        commands = char_to_hplot(char, current_x, y_start, weight, size, font_name, hcolor, gr_mode)
         all_commands.extend(commands)
         # Spacing is affected by size, but not weight
         current_x += char_spacing * size
@@ -552,10 +586,10 @@ def text_to_hplot(text, x_start=10, y_start=80, char_spacing=6, weight=1, size=1
 
 
 def generate_text_effect(text, x=10, y=80, spacing=6, line=1000, inc=1, 
-                        hcolor=3, use_vars=False, weight=1, size=1, font_name='default'):
+                        hcolor=3, use_vars=False, weight=1, size=1, font_name='default', gr_mode=False):
     """Generate text drawing code."""
     hplot_commands = text_to_hplot(text, x if not use_vars else 0, 
-                                   y if not use_vars else 0, spacing, weight, size, font_name, hcolor)
+                                   y if not use_vars else 0, spacing, weight, size, font_name, hcolor, gr_mode)
     
     lines = []
     current_line = line
@@ -570,24 +604,35 @@ def generate_text_effect(text, x=10, y=80, spacing=6, line=1000, inc=1,
         lines.append(f"{current_line} REM ** AT X={x}, Y={y} **")
         current_line += inc
     
-    # For dithered colors, HCOLOR commands are inline with the plot commands
-    # For solid colors, set HCOLOR once at the beginning
+    # For dithered colors (HGR only), HCOLOR commands are inline with the plot commands
+    # For solid colors, set HCOLOR/COLOR once at the beginning
     if hcolor < 100:
-        lines.append(f"{current_line} HCOLOR = {hcolor}")
+        if gr_mode:
+            lines.append(f"{current_line} COLOR = {hcolor}")
+        else:
+            lines.append(f"{current_line} HCOLOR = {hcolor}")
         current_line += inc
     
     current_line_text = f"{current_line} "
     
     for cmd in hplot_commands:
-        if use_vars and not cmd.startswith("HCOLOR"):
-            if " TO " in cmd:
-                parts = cmd.replace("HPLOT ", "").split(" TO ")
-                x1, y1 = parts[0].split(",")
-                x2, y2 = parts[1].split(",")
-                new_cmd = f"HPLOT DX+{x1},DY+{y1} TO DX+{x2},DY+{y2}"
+        if use_vars and not cmd.startswith("HCOLOR") and not cmd.startswith("COLOR"):
+            # Handle both HPLOT and PLOT commands
+            if gr_mode:
+                if "," in cmd:
+                    x, y = cmd.replace("PLOT ", "").split(",")
+                    new_cmd = f"PLOT DX+{x},DY+{y}"
+                else:
+                    new_cmd = cmd
             else:
-                x, y = cmd.replace("HPLOT ", "").split(",")
-                new_cmd = f"HPLOT DX+{x},DY+{y}"
+                if " TO " in cmd:
+                    parts = cmd.replace("HPLOT ", "").split(" TO ")
+                    x1, y1 = parts[0].split(",")
+                    x2, y2 = parts[1].split(",")
+                    new_cmd = f"HPLOT DX+{x1},DY+{y1} TO DX+{x2},DY+{y2}"
+                else:
+                    x, y = cmd.replace("HPLOT ", "").split(",")
+                    new_cmd = f"HPLOT DX+{x},DY+{y}"
         else:
             new_cmd = cmd
         
@@ -615,7 +660,7 @@ def generate_text_effect(text, x=10, y=80, spacing=6, line=1000, inc=1,
 
 
 def generate_scroller(text_line, scroll_params, x, y, spacing=6, 
-                     line=500, inc=1, hcolor=3, weight=1, size=1, font_name='default', text_routine_line=1000):
+                     line=500, inc=1, hcolor=3, weight=1, size=1, font_name='default', text_routine_line=1000, gr_mode=False):
     """Generate scrolling text code."""
     scroll_x, scroll_y, iterations = scroll_params
     
@@ -625,16 +670,23 @@ def generate_scroller(text_line, scroll_params, x, y, spacing=6,
     lines.append(f"{line+10} REM ** SCROLL: X={scroll_x}, Y={scroll_y}, ITER={iterations} **")
     lines.append(f"{line+30} DX = {x}: DY = {y}")
     lines.append(f"{line+40} FOR SC = 1 TO {iterations}")
-    lines.append(f"{line+50} IF DX < -100 OR DX > 379 THEN {line+90}")
-    lines.append(f"{line+60} IF DY < -100 OR DY > 291 THEN {line+90}")
+    if gr_mode:
+        lines.append(f"{line+50} IF DX < -20 OR DX > 59 THEN {line+90}")
+        lines.append(f"{line+60} IF DY < -20 OR DY > 67 THEN {line+90}")
+    else:
+        lines.append(f"{line+50} IF DX < -100 OR DX > 379 THEN {line+90}")
+        lines.append(f"{line+60} IF DY < -100 OR DY > 291 THEN {line+90}")
     lines.append(f"{line+70} GOSUB {text_routine_line}")
     lines.append(f"{line+80} DX = DX + {scroll_x}: DY = DY + {scroll_y}")
-    lines.append(f"{line+90} HGR: HCOLOR = {hcolor}")
+    if gr_mode:
+        lines.append(f"{line+90} GR: COLOR = {hcolor}")
+    else:
+        lines.append(f"{line+90} HGR: HCOLOR = {hcolor}")
     lines.append(f"{line+100} NEXT SC")
     lines.append(f"{line+110} RETURN")
     lines.append("")
     
-    text_code = generate_text_effect(text_line, 0, 0, spacing, text_routine_line, inc, hcolor, use_vars=True, weight=weight, size=size, font_name=font_name)
+    text_code = generate_text_effect(text_line, 0, 0, spacing, text_routine_line, inc, hcolor, use_vars=True, weight=weight, size=size, font_name=font_name, gr_mode=gr_mode)
     
     return "\n".join(lines) + "\n" + text_code
 
@@ -643,33 +695,33 @@ def print_help():
     """Print DOS-style help."""
     print("""
 ==============================================================================
-               APPLE II HGR EFFECTS TOOLKIT v3.0
-                   Fast HGR code generation
+               APPLE II HGR/GR EFFECTS TOOLKIT v3.0
+                Fast HGR/GR code generation
 ==============================================================================
 
 USAGE:
-  python hgr.py --text "STRING" [options] --text "STRING" [options] ... [--bootloader]
+  python hgr.py [--gr] --text "STRING" [options] --text "STRING" [options] ... [--bootloader]
 
 EFFECTS:
   --text "STRING"         Draw text (static or scrolling)
 
 GLOBAL OPTIONS (apply to entire script):
-  --fill NUM              Fill screen with HCOLOR 0-7 before drawing
-  --bootloader            Include bootloader (HGR/GOSUB/END)
+  --gr                    Use GR (Low-Res) mode instead of HGR (Hi-Res)
+  --fill NUM              Fill screen with HCOLOR/COLOR before drawing
+  --bootloader            Include bootloader (HGR/GR/GOSUB/END)
   -o FILE                 Save to file
 
 TEXT BLOCK OPTIONS (apply to individual text block):
-  -x NUM                  X coordinate (0-279, default: 10 static, 279 scroll)
-  -y NUM                  Y coordinate (0-191, default: 80 static, 12 scroll)
-  -color NUM              HCOLOR value 0-7 (default: 3=white)
-                          Dithered colors (100+):
-                            100=yellow, 101=light blue, 102=light green,
-                            103=light purple, 104=brown, 105=gray, 106=pink,
-                            107=aqua, 108=lime, 109=tan
-  -weight NUM             Font weight/thickness (1-3, default: 2)
-  -size NUM               Font scale/size (1=normal, 2=2x, 3=3x, default: 2)
-                          Size multiplies character dimensions - size 2 doubles
-                          both width and height. Spacing scales with size.
+  -x NUM                  X coordinate (HGR: 0-279, GR: 0-39)
+  -y NUM                  Y coordinate (HGR: 0-191, GR: 0-47)
+  -color NUM              Color value
+                          HGR: 0-7 (solid), 100-109 (dithered)
+                          GR: 0-15 (solid only)
+  -weight NUM             Font weight/thickness (1-3)
+                          Default: HGR=2, GR=1
+  -size NUM               Font scale/size (1-5)
+                          Default: HGR=2, GR=1
+                          Size multiplies character dimensions
   -font NAME              Font style: default, tiny, bold, bubble (default: default)
   -spacing NUM            Character spacing (default: 6)
   -scroll X,Y,ITER        Make text scroll (e.g., -scroll -2,0,140)
@@ -677,35 +729,47 @@ TEXT BLOCK OPTIONS (apply to individual text block):
                           Y = vert speed (neg=up)
                           ITER = frames
 
+HGR MODE COLORS (0-7 + dithered 100-109):
+  0=black, 1=green, 2=purple, 3=white (MSB=0)
+  4=black, 5=orange, 6=blue, 7=white (MSB=1)
+  100=yellow, 101=light blue, 102=light green, 103=light purple,
+  104=brown, 105=gray, 106=pink, 107=aqua, 108=lime, 109=tan
+
+GR MODE COLORS (0-15):
+  0=black, 1=magenta, 2=dark blue, 3=purple
+  4=dark green, 5=gray 1, 6=medium blue, 7=light blue
+  8=brown, 9=orange, 10=gray 2, 11=pink
+  12=light green, 13=yellow, 14=aqua, 15=white
+
 EXAMPLES:
 
-  Single text:
+  HGR single text:
     python hgr.py --text "GAME OVER" -x 80 -y 90 --bootloader
 
-  Multiple text blocks:
+  GR mode text (short words only - 40 blocks wide!):
+    python hgr.py --gr --text "SCORE" -x 5 -y 10 -color 13 --bootloader
+
+  HGR multiple text blocks:
     python hgr.py --text "VHS Cassette" -x 200 -y 20 --text "Play" -x 20 -y 120 --bootloader
 
-  Left scroll:
-    python hgr.py --text "NEWS" -scroll -2,0,140 -x 279 -y 12 --bootloader
+  GR left scroll (single words work best):
+    python hgr.py --gr --text "NEWS" -scroll -1,0,50 -x 39 -y 10 --bootloader
 
-  Double-width text with fill:
+  HGR double-width text with fill:
     python hgr.py --text "HELLO" -weight 2 --fill 0 --bootloader
 
-  Tiny font for compact text:
-    python hgr.py --text "SYSTEM STATUS" -font tiny -weight 1 --bootloader
+  GR tiny font for more text (~8-10 chars):
+    python hgr.py --gr --text "HI SCORE" -font tiny -x 2 -y 2 -spacing 4 --bootloader
 
-  Bold font for emphasis:
-    python hgr.py --text "WARNING" -font bold -x 80 -y 80 --bootloader
-
-  Yellow text with dithering:
+  HGR yellow text with dithering:
     python hgr.py --text "LEMON" -color 100 -x 80 -y 80 --bootloader
 
-  Mixed static and scrolling:
-    python hgr.py --text "TITLE" -x 100 -y 20 -weight 2 --text "SCROLL" -scroll -1,0,200 --bootloader
+  GR multiple labels (best use case):
+    python hgr.py --gr --text "P1" -x 2 -y 5 --text "P2" -x 35 -y 5 --bootloader
 
 LIMITS:
-  X: 0-279 (max 279)    Y: 0-191 (max 191)
-  HCOLOR: 0-7           WEIGHT: 1-3
+  HGR: X: 0-279, Y: 0-191, HCOLOR: 0-7 (or 100-109 dithered)
+  GR:  X: 0-39,  Y: 0-47,  COLOR: 0-15
 
 SPECIAL CHARACTERS:
   Supports blocks, shapes, arrows, symbols, and card suits.
@@ -729,26 +793,31 @@ def main():
     bootloader = False
     output_file = None
     fill_color = None
+    gr_mode = False
     errors = []
     
     while i < len(sys.argv):
         arg = sys.argv[i]
         
-        if arg == '--bootloader':
+        if arg == '--gr':
+            gr_mode = True
+            i += 1
+        elif arg == '--bootloader':
             bootloader = True
             i += 1
         elif arg == '--fill':
             if i + 1 < len(sys.argv):
                 try:
                     fill_color = int(sys.argv[i + 1])
-                    if fill_color < 0 or fill_color > 7:
-                        errors.append(f"--fill value {fill_color} out of range (0-7)")
+                    max_fill = 15 if gr_mode else 7
+                    if fill_color < 0 or fill_color > max_fill:
+                        errors.append(f"--fill value {fill_color} out of range (0-{max_fill} for {'GR' if gr_mode else 'HGR'})")
                         fill_color = None
                 except ValueError:
-                    errors.append(f"--fill requires a number 0-7, got '{sys.argv[i + 1]}'")
+                    errors.append(f"--fill requires a number, got '{sys.argv[i + 1]}'")
                 i += 2
             else:
-                print("ERROR: --fill requires a value (0-7)")
+                print(f"ERROR: --fill requires a value (0-{'15 for GR' if gr_mode else '7 for HGR'})")
                 sys.exit(1)
         elif arg in ['-o', '--output']:
             if i + 1 < len(sys.argv):
@@ -759,8 +828,11 @@ def main():
                 sys.exit(1)
         elif arg == '--text':
             # Parse text block (can be static or scrolling based on -scroll option)
+            # GR mode needs different defaults due to only 40 blocks width
+            default_weight = 1 if gr_mode else 2
+            default_size = 1 if gr_mode else 2
             block = {'type': 'text', 'text': None, 'x': None, 'y': None, 'spacing': 6, 
-                    'hcolor': 3, 'weight': 2, 'size': 2, 'font': 'default', 'scroll': None}
+                    'hcolor': 3, 'weight': default_weight, 'size': default_size, 'font': 'default', 'scroll': None}
             i += 1
             
             # Get text string
@@ -776,16 +848,18 @@ def main():
                 if sys.argv[i] == '-x' and i + 1 < len(sys.argv):
                     try:
                         block['x'] = int(sys.argv[i + 1])
-                        if block['x'] < 0 or block['x'] > 279:
-                            errors.append(f"X coordinate {block['x']} out of bounds (0-279)")
+                        max_x = 39 if gr_mode else 279
+                        if block['x'] < 0 or block['x'] > max_x:
+                            errors.append(f"X coordinate {block['x']} out of bounds (0-{max_x} for {'GR' if gr_mode else 'HGR'})")
                     except ValueError:
                         errors.append(f"-x requires a number, got '{sys.argv[i + 1]}'")
                     i += 2
                 elif sys.argv[i] == '-y' and i + 1 < len(sys.argv):
                     try:
                         block['y'] = int(sys.argv[i + 1])
-                        if block['y'] < 0 or block['y'] > 191:
-                            errors.append(f"Y coordinate {block['y']} out of bounds (0-191)")
+                        max_y = 47 if gr_mode else 191
+                        if block['y'] < 0 or block['y'] > max_y:
+                            errors.append(f"Y coordinate {block['y']} out of bounds (0-{max_y} for {'GR' if gr_mode else 'HGR'})")
                     except ValueError:
                         errors.append(f"-y requires a number, got '{sys.argv[i + 1]}'")
                     i += 2
@@ -795,11 +869,17 @@ def main():
                 elif sys.argv[i] in ['-color', '-hcolor'] and i + 1 < len(sys.argv):
                     try:
                         block['hcolor'] = int(sys.argv[i + 1])
-                        # Allow 0-7 for solid colors, 100-109 for dithered colors
-                        if block['hcolor'] < 0 or (block['hcolor'] > 7 and block['hcolor'] < 100) or block['hcolor'] > 109:
-                            errors.append(f"HCOLOR {block['hcolor']} out of range (0-7 or 100-109 for dithered)")
+                        if gr_mode:
+                            # GR mode: 0-15 solid colors only
+                            if block['hcolor'] < 0 or block['hcolor'] > 15:
+                                errors.append(f"COLOR {block['hcolor']} out of range (0-15 for GR mode)")
+                        else:
+                            # HGR mode: 0-7 for solid colors, 100-109 for dithered colors
+                            if block['hcolor'] < 0 or (block['hcolor'] > 7 and block['hcolor'] < 100) or block['hcolor'] > 109:
+                                errors.append(f"HCOLOR {block['hcolor']} out of range (0-7 or 100-109 for dithered)")
                     except ValueError:
-                        errors.append(f"-color requires a number (0-7 or 100-109), got '{sys.argv[i + 1]}'")
+                        color_range = "0-15" if gr_mode else "0-7 or 100-109"
+                        errors.append(f"-color requires a number ({color_range}), got '{sys.argv[i + 1]}'")
                     i += 2
                 elif sys.argv[i] == '-weight' and i + 1 < len(sys.argv):
                     try:
@@ -830,29 +910,29 @@ def main():
                 elif sys.argv[i] == '-scroll' and i + 1 < len(sys.argv):
                     block['scroll'] = sys.argv[i + 1]
                     i += 2
-                elif sys.argv[i] in ['--text', '--bootloader', '-o', '--output', '--fill']:
+                elif sys.argv[i] in ['--text', '--bootloader', '--gr', '-o', '--output', '--fill']:
                     # Next command/option, stop parsing this block
                     break
                 else:
                     print(f"ERROR: Unknown option '{sys.argv[i]}'")
                     sys.exit(1)
             
-            # Set default X/Y based on scroll vs static
+            # Set default X/Y based on scroll vs static and mode
             if block['scroll']:
                 block['type'] = 'scroll'
                 if block['x'] is None:
-                    block['x'] = 279
+                    block['x'] = 39 if gr_mode else 279
                 if block['y'] is None:
-                    block['y'] = 12
+                    block['y'] = 5 if gr_mode else 12
             else:
                 if block['x'] is None:
-                    block['x'] = 10
+                    block['x'] = 5 if gr_mode else 10
                 if block['y'] is None:
-                    block['y'] = 80
+                    block['y'] = 20 if gr_mode else 80
             
             text_blocks.append(block)
         else:
-            print(f"ERROR: Unknown command '{arg}'. Valid commands: --text, --fill, --bootloader")
+            print(f"ERROR: Unknown command '{arg}'. Valid commands: --gr, --text, --fill, --bootloader")
             sys.exit(1)
     
     if not text_blocks:
@@ -866,12 +946,20 @@ def main():
     
     if bootloader:
         code += "1 REM ** BOOTLOADER **\n"
-        code += "5 HGR\n"
+        if gr_mode:
+            code += "5 GR\n"
+        else:
+            code += "5 HGR\n"
         
         # Add fill if requested
         if fill_color is not None:
             code += f"7 REM ** FILL SCREEN **\n"
-            code += f"8 HCOLOR = {fill_color}: HPLOT 0,0: CALL 62454\n"
+            if gr_mode:
+                # GR mode fill - plot all blocks
+                code += f"8 COLOR = {fill_color}: FOR Y = 0 TO 47: FOR X = 0 TO 39: PLOT X,Y: NEXT: NEXT\n"
+            else:
+                # HGR mode fill - use fast ROM routine
+                code += f"8 HCOLOR = {fill_color}: HPLOT 0,0: CALL 62454\n"
         
         # Add GOSUB calls for each text block
         # Scrolling text needs to call the scroller control (500 series)
@@ -897,7 +985,7 @@ def main():
         if block['type'] == 'text':
             code += generate_text_effect(block['text'], block['x'], block['y'],
                                         block['spacing'], current_line, 1,
-                                        block['hcolor'], use_vars=False, weight=block['weight'], size=block['size'], font_name=block['font'])
+                                        block['hcolor'], use_vars=False, weight=block['weight'], size=block['size'], font_name=block['font'], gr_mode=gr_mode)
             code += "\n\n"
             current_line += 500
         elif block['type'] == 'scroll':
@@ -917,7 +1005,7 @@ def main():
             code += generate_scroller(block['text'], scroll_params, block['x'],
                                      block['y'], block['spacing'], scroll_line,
                                      1, block['hcolor'], weight=block['weight'], size=block['size'],
-                                     font_name=block['font'], text_routine_line=current_line)
+                                     font_name=block['font'], text_routine_line=current_line, gr_mode=gr_mode)
             code += "\n\n"
             scroll_line += 500
             current_line += 500
@@ -952,26 +1040,41 @@ def main():
         
         if unique_colors:
             print()
-            print("APPLE II HGR COLOR INFORMATION")
-            print("=" * 70)
-            print("Colors used in this program:")
-            for color in sorted(unique_colors):
-                if color in COLOR_INFO:
-                    info = COLOR_INFO[color]
-                    if color >= 100:
-                        # Dithered color
+            if gr_mode:
+                print("APPLE II GR COLOR INFORMATION")
+                print("=" * 70)
+                print("Colors used in this program:")
+                for color in sorted(unique_colors):
+                    if color in GR_COLOR_INFO:
+                        info = GR_COLOR_INFO[color]
                         print(f"  COLOR {color}: {info['name'].upper()}")
-                    else:
-                        # Solid color
-                        print(f"  HCOLOR {color}: {info['name'].upper()} (MSB={info['msb']}, {info['palette']} palette)")
-            print()
-            print("MSB=0 colors (0-3): Green/Purple palette")
-            print("MSB=1 colors (4-7): Orange/Blue palette")
-            print("Dithered colors (100+): Checkerboard pattern mixing two colors")
-            print()
-            print("Note: Mixing colors from different MSB palettes can cause color")
-            print("shifts due to the high bit affecting 7-pixel blocks.")
-            print("Using -weight 2 or 3 helps minimize NTSC artifact issues.")
+                print()
+                print("GR Mode Color Palette (0-15):")
+                print("  0=Black      1=Magenta    2=Dark Blue  3=Purple")
+                print("  4=Dark Green 5=Gray 1     6=Medium Blu 7=Light Blue")
+                print("  8=Brown      9=Orange     10=Gray 2    11=Pink")
+                print("  12=Lt Green  13=Yellow    14=Aqua      15=White")
+            else:
+                print("APPLE II HGR COLOR INFORMATION")
+                print("=" * 70)
+                print("Colors used in this program:")
+                for color in sorted(unique_colors):
+                    if color in HGR_COLOR_INFO:
+                        info = HGR_COLOR_INFO[color]
+                        if color >= 100:
+                            # Dithered color
+                            print(f"  COLOR {color}: {info['name'].upper()}")
+                        else:
+                            # Solid color
+                            print(f"  HCOLOR {color}: {info['name'].upper()} (MSB={info['msb']}, {info['palette']} palette)")
+                print()
+                print("MSB=0 colors (0-3): Green/Purple palette")
+                print("MSB=1 colors (4-7): Orange/Blue palette")
+                print("Dithered colors (100+): Checkerboard pattern mixing two colors")
+                print()
+                print("Note: Mixing colors from different MSB palettes can cause color")
+                print("shifts due to the high bit affecting 7-pixel blocks.")
+                print("Using -weight 2 or 3 helps minimize NTSC artifact issues.")
             print("=" * 70)
 
 

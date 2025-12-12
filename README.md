@@ -1,6 +1,6 @@
-# Apple II HGR Toolkit
+# Apple II HGR/GR Toolkit
 
-A Python-based code generator for creating Applesoft BASIC programs with HGR (High Resolution Graphics) text effects for the Apple II computer.
+A Python-based code generator for creating Applesoft BASIC programs with HGR (High Resolution Graphics) and GR (Low Resolution Graphics) text effects for the Apple II computer.
 
 > **AI-Assisted Development Notice**
 > 
@@ -12,16 +12,18 @@ A Python-based code generator for creating Applesoft BASIC programs with HGR (Hi
 
 ## Features
 
-- **Bitmap Text Rendering**: Generates optimized HPLOT commands from built-in fonts
+- **Dual Graphics Modes**: Support for both HGR (280×192) and GR (40×48) modes
+- **Bitmap Text Rendering**: Generates optimized HPLOT/PLOT commands from built-in fonts
 - **Multiple Font Styles**: Choose from default, tiny, bold, or bubble fonts
 - **Multiple Text Blocks**: Create multiple text elements at different positions with a single command
 - **Scrolling Text**: Animated scrolling effects with configurable speed and direction
-- **Dithered Colors**: Create additional colors (yellow, pink, lime, gray, etc.) using checkerboard dithering
+- **Dithered Colors** (HGR only): Create additional colors (yellow, pink, lime, gray, etc.) using checkerboard dithering
+- **Full Color Palettes**: HGR (8 colors + 10 dithered), GR (16 colors)
 - **Font Weight Control**: Single, double, or triple width strokes to combat NTSC artifacts
 - **Screen Fill**: Optional screen clearing with specified background color
-- **Configurable Colors**: Full HCOLOR support (0-7) plus dithered colors (100-109)
+- **Configurable Colors**: Full HCOLOR support (0-7 + dithered 100-109) for HGR, COLOR support (0-15) for GR
 - **Input Validation**: Automatic bounds checking with warnings for out-of-range coordinates
-- **Bootloader Generation**: Optional automatic setup code (HGR initialization, GOSUB calls, END)
+- **Bootloader Generation**: Optional automatic setup code (HGR/GR initialization, GOSUB calls, END)
 
 ## Requirements
 
@@ -44,8 +46,10 @@ No additional dependencies required - uses only Python standard library.
 ### Basic Syntax
 
 ```bash
-python hgr-create.py --text "STRING" [options] --text "STRING" [options] ... [--bootloader]
+python hgr-create.py [--gr] --text "STRING" [options] --text "STRING" [options] ... [--bootloader]
 ```
+
+The `--gr` flag switches from HGR (High Resolution) mode to GR (Low Resolution) mode.
 
 ### Command Structure
 
@@ -72,22 +76,25 @@ python hgr-create.py --text "BREAKING NEWS" -scroll -2,0,140 -x 279 -y 12 --boot
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `--bootloader` | Include HGR setup and GOSUB calls | Off |
-| `--fill NUM` | Fill screen with HCOLOR (0-7) before drawing | None |
+| `--gr` | Use GR (Low-Res) mode instead of HGR (Hi-Res) | HGR mode |
+| `--bootloader` | Include graphics mode setup and GOSUB calls | Off |
+| `--fill NUM` | Fill screen before drawing (HGR: 0-7, GR: 0-15) | None |
 | `-o FILE` | Save output to file | Stdout |
 
 ### Text Block Options
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `-x NUM` | X coordinate (0-279) | 10 for static, 279 for scroll |
-| `-y NUM` | Y coordinate (0-191) | 80 for static, 12 for scroll |
-| `-color NUM` | Color value: 0-7 (solid), 100-109 (dithered) | 3 (white) |
-| `-weight NUM` | Font weight/thickness (1-3) | 2 (double) |
-| `-size NUM` | Text size multiplier (1-5) | 1 (normal) |
+| `-x NUM` | X coordinate (HGR: 0-279, GR: 0-39) | HGR: 10, GR: 5 (static)<br>HGR: 279, GR: 39 (scroll) |
+| `-y NUM` | Y coordinate (HGR: 0-191, GR: 0-47) | HGR: 80, GR: 20 (static)<br>HGR: 12, GR: 5 (scroll) |
+| `-color NUM` | Color value<br>HGR: 0-7 (solid), 100-109 (dithered)<br>GR: 0-15 (solid only) | 3 (white in both modes) |
+| `-weight NUM` | Font weight/thickness (1-3) | HGR: 2, GR: 1 |
+| `-size NUM` | Text size multiplier (1-5) | HGR: 2, GR: 1 |
 | `-font NAME` | Font style (default, tiny, bold, bubble) | default |
 | `-spacing NUM` | Character spacing in pixels | 6 |
 | `-scroll X,Y,ITER` | Enable scrolling with parameters | None (static) |
+
+**Note**: GR mode defaults to `-weight 1 -size 1` to maximize text capacity on the 40-block-wide screen.
 
 ### Scroll Parameters
 
@@ -100,6 +107,8 @@ Format: `-scroll X,Y,ITERATIONS`
 Example: `-scroll -2,0,140` scrolls left at 2 pixels per frame for 140 frames
 
 ## Examples
+
+### HGR Mode Examples
 
 ### Example 1: Simple Title Screen
 
@@ -181,12 +190,67 @@ python hgr-create.py --text "YELLOW" -color 100 -x 10 -y 10 --text "PINK" -color
 python hgr-create.py --text "TITLE" -x 100 -y 20 -weight 2 --text "NEWS FLASH" -scroll -1,0,200 --bootloader
 ```
 
-## Apple II HGR Reference
+### GR Mode Examples
 
-### Screen Resolution
+**Important**: GR mode has only 40 blocks of horizontal resolution. Use short text (single words or labels) for best results.
+
+### Example 14: Simple GR Label
+
+```bash
+python hgr-create.py --gr --text "SCORE" -x 2 -y 2 -color 13 --bootloader
+```
+
+Renders yellow "SCORE" label in GR mode. Default settings (weight=1, size=1) used automatically.
+
+### Example 15: GR Numeric Display
+
+```bash
+python hgr-create.py --gr --text "1000" -x 15 -y 10 -color 15 --fill 0 --bootloader
+```
+
+White numbers on black background - perfect for score displays.
+
+### Example 16: GR Scrolling Ticker
+
+```bash
+python hgr-create.py --gr --text "NEWS" -scroll -1,0,50 -x 39 -y 10 -color 9 --bootloader
+```
+
+Short word scrolling in orange - GR is better for single-word tickers.
+
+### Example 17: GR Status Label
+
+```bash
+python hgr-create.py --gr --text "READY" -x 5 -y 20 -color 12 --bootloader
+```
+
+Single-word status in bright green.
+
+### Example 18: GR Tiny Font (Maximum Text)
+
+```bash
+python hgr-create.py --gr --text "HI SCORE" -font tiny -x 2 -y 2 -color 15 -spacing 4 --bootloader
+```
+
+Using tiny font with reduced spacing to fit more text (~8-10 characters possible).
+
+### Example 19: GR Multiple Labels
+
+```bash
+python hgr-create.py --gr --text "P1" -x 2 -y 5 -color 1 --text "P2" -x 35 -y 5 -color 6 --text "GO" -x 18 -y 20 -color 13 --bootloader
+```
+
+Multiple short labels in different colors for game UI.
+
+## Apple II Graphics Modes Reference
+
+### HGR (High-Resolution Graphics) Mode
+
+#### Screen Resolution
 - **Hi-Res Mode**: 280×192 pixels  
 - **Effective Color Resolution**: 140×192 (due to NTSC artifact color)
 - **Coordinate System**: X: 0-279, Y: 0-191
+- **Memory**: 8KB at $2000-$3FFF
 
 ### Understanding Apple II HGR Colors
 
@@ -268,13 +332,94 @@ The toolkit includes four font styles that can be selected with the `-font` opti
 
 All fonts support uppercase letters, lowercase letters, numbers, and basic punctuation. Special characters (blocks, arrows, symbols, card suits, box-drawing) automatically use the default font regardless of the font selected, ensuring consistent rendering of these elements across all font styles.
 
+### GR (Low-Resolution Graphics) Mode
+
+#### Screen Resolution
+- **Lo-Res Mode**: 40×48 blocks (or 40×40 with text window)
+- **Physical Display**: Each block is approximately 7×8 pixels on screen
+- **Coordinate System**: X: 0-39, Y: 0-47 (full screen) or 0-39 (with bottom 4 text lines)
+- **Memory**: 1KB at $400-$7FF (page 1) or $800-$BFF (page 2)
+- **Color System**: Direct 16-color palette (no NTSC artifacts)
+
+#### GR Color Palette (0-15)
+
+GR mode provides 16 solid colors without the complexity of HGR's NTSC color system:
+
+| Value | Color Name | Description |
+|-------|-----------|-------------|
+| 0 | Black | Pure black |
+| 1 | Magenta | Bright magenta/pink |
+| 2 | Dark Blue | Deep blue |
+| 3 | Purple | Purple/violet |
+| 4 | Dark Green | Forest green |
+| 5 | Gray 1 | Dark gray |
+| 6 | Medium Blue | Medium blue |
+| 7 | Light Blue | Sky blue |
+| 8 | Brown | Brown |
+| 9 | Orange | Bright orange |
+| 10 | Gray 2 | Light gray |
+| 11 | Pink | Light pink |
+| 12 | Light Green | Bright green |
+| 13 | Yellow | Bright yellow |
+| 14 | Aqua | Aqua/cyan |
+| 15 | White | Pure white |
+
+#### GR Mode Advantages
+
+1. **Simpler Color System**: No MSB palettes or color interference - each block is independently colored
+2. **True 16 Colors**: All 16 colors available without dithering
+3. **Faster Rendering**: Larger blocks mean less memory access and faster drawing
+4. **No NTSC Artifacts**: Colors are solid and don't depend on pixel positioning
+5. **Less Memory**: GR screens use only 1KB vs HGR's 8KB
+
+#### GR Mode Limitations
+
+1. **Lower Resolution**: 40×48 blocks vs HGR's 280×192 pixels
+2. **Blocky Appearance**: Each "pixel" is actually a large colored block
+3. **No Dithering Support**: The toolkit doesn't support dithered colors in GR mode (not needed with 16 colors)
+4. **Limited Text Width**: With only 40 blocks horizontally, text capacity is severely limited:
+   - **Default settings (weight=1, size=1)**: ~6-7 characters per line
+   - **Tiny font (weight=1, size=1)**: ~8-10 characters per line
+   - **Bold/larger text**: Only 3-4 characters per line
+   - **Recommendation**: Use `-weight 1 -size 1` for readable text in GR mode
+
+**IMPORTANT**: GR mode is best suited for **very short text** (single words, labels, scores) rather than full sentences. The 40-block width makes it impractical for most text display purposes. Consider using HGR mode if you need to display more than a few characters.
+
+#### When to Use GR Mode
+
+- **Single-word labels** or **very short text** (3-7 characters)
+- **Numeric scores/counters** in games
+- **Simple icons or symbols** using block characters
+- **Color-coded status indicators**
+- **Fast animations** requiring quick screen updates
+- **Memory-constrained programs** needing smaller graphics buffers
+
+**NOT recommended for:**
+- Full sentences or paragraphs (use HGR mode instead)
+- Detailed text displays
+- Multiple lines of readable text
+
+**Pro tip**: For GR mode, always use `-weight 1 -size 1` (which is now the default for GR) to maximize text capacity. Even with these settings, you'll only fit about 6-7 characters across the screen.
+
 ### Practical Color Tips
 
+**For HGR Mode:**
 - **Safest Approach**: Use HCOLOR 3 or 7 (white) on black backgrounds (--fill 0)
 - **Same Palette**: Stick to colors from the same MSB palette (0-3 OR 4-7)
 - **Use Weight**: For colored text on colored backgrounds, use `-weight 2` or `-weight 3`
 - **Dithering for More Colors**: Use dithered colors (100-109) to create yellow, pink, lime, gray, and other tones
 - **Test First**: Always test your color combinations in an emulator before finalizing
+
+**For GR Mode:**
+- **Keep text SHORT**: Maximum 6-7 characters with default settings
+- **Single words work best**: "SCORE", "READY", "GO", "LIVES", etc.
+- **Use for labels, not sentences**: GR excels at UI labels and counters
+- **Tiny font gains ~3-4 more characters**: Use `-font tiny -spacing 4` for "HI SCORE" etc.
+- **No palette restrictions**: Mix any of the 16 colors freely
+- **High Contrast**: Use high-contrast combinations for readability (e.g., 13/0 yellow on black, 15/2 white on dark blue)
+- **Fast Updates**: GR mode is ideal for frequently updated displays due to smaller memory footprint
+- **Color Testing**: Test on composite displays - colors may appear different than on RGB monitors
+- **Consider HGR instead**: If you need more than 5-6 characters, use HGR mode
 
 ### Technical Details: The 64:1 Interleave
 
@@ -365,29 +510,42 @@ Supported characters:
 8. **Color Consistency**: Stick to one MSB palette (0-3 or 4-7) to avoid color interference
 9. **Dithering Memory Cost**: Dithered colors require significantly more memory than solid colors—use them for small decorative elements rather than large graphics
 
-### Saving and Loading HGR Screens
+### Saving and Loading Graphics Screens
 
 The generated BASIC programs can use significant memory. Once you've run your program and created the graphics screen, you can save just the graphics buffer as a binary file and load it instantly without re-executing the BASIC code:
 
-**To save the current HGR screen:**
+**To save HGR screens:**
 ```basic
 BSAVE MYGRAPHIC,A$2000,L$2000
 ```
 
 This saves 8KB (8192 bytes = $2000 hex) starting at memory address $2000 (8192 decimal), which is where HGR Page 1 resides.
 
-**To load a saved HGR screen:**
+**To load HGR screens:**
 ```basic
 HGR : BLOAD MYGRAPHIC,A$2000
+```
+
+**To save GR screens:**
+```basic
+BSAVE MYGRAPHIC,A$400,L$400
+```
+
+This saves 1KB (1024 bytes = $400 hex) starting at memory address $400 (1024 decimal), which is where GR Page 1 resides.
+
+**To load GR screens:**
+```basic
+GR : BLOAD MYGRAPHIC,A$400
 ```
 
 The `HGR` command switches to Hi-Res graphics mode, then `BLOAD` loads the binary data directly into the graphics memory.
 
 **Why this is useful:**
-- **Memory savings**: The BASIC program with all the HPLOT commands can be 10-20KB or more, but the final screen is always exactly 8KB
-- **Instant display**: Loading a binary screen file is nearly instantaneous compared to executing hundreds of HPLOT commands
+- **Memory savings**: BASIC programs with all the HPLOT/PLOT commands can be 10-20KB or more, but final screens are always 8KB (HGR) or 1KB (GR)
+- **Instant display**: Loading a binary screen file is nearly instantaneous compared to executing hundreds of HPLOT/PLOT commands
 - **Title screens**: Perfect for game title screens or splash screens that don't need to be regenerated
 - **Disk space**: Save multiple screen variants and load them as needed
+- **GR advantage**: GR screens are only 1KB, making them 8x smaller than HGR screens!
 
 **HGR Page 2 (if using second page):**
 ```basic
@@ -399,21 +557,26 @@ BLOAD MYGRAPHIC2,A$4000
 
 ## Technical Details
 
-- Font is rendered as optimized HPLOT commands with horizontal line optimization
+- Fonts rendered as optimized HPLOT (HGR) or PLOT (GR) commands
+- HGR uses horizontal line optimization with `HPLOT TO` for efficiency
+- GR plots individual blocks (no line drawing optimization available)
 - Weight multiplies stroke thickness (1=single, 2=double, 3=triple pixel width)
 - Size multiplies both character dimensions and weight for proportional scaling
 - Scroll effects use DX/DY variables for position offsets, enabling dynamic positioning
-- Line number allocation: 1-100 for bootloader, 50+ for text subroutines
+- Line number allocation: 1-100 for bootloader, 500+ for scrollers, 1000+ for text subroutines
 - Generated code is compatible with Applesoft BASIC on Apple II/II+/IIe/IIc/IIGS
-- CALL 62454 ($F3F2) is the fast HGR clear routine in the Monitor ROM
+- HGR: CALL 62454 ($F3F2) is the fast HGR clear routine in the Monitor ROM
+- GR: Screen fill uses nested FOR loops to plot all 1920 blocks (40×48)
 
 ## Limitations
 
 - Maximum line length handled automatically (splits at ~230 chars)
-- Monochrome per text block (HGR color fringing applies)
-- Font is fixed 5×7 pixels (scaled by weight parameter)
+- HGR: Monochrome per text block (HGR color fringing applies)
+- GR: True color per block (no fringing)
+- Font is fixed 5×7 or 3×5 pixels (scaled by weight and size parameters)
 - Weight values clamped to 1-3 range
-- **Dithered colors (100-109) generate significantly more code**: A typical dithered text block produces 100-200+ lines of BASIC code versus the usual 50 lines for solid colors. This is due to the checkerboard pattern requiring more granular HPLOT statements. Use dithering sparingly for small text or decorative elements where memory permits.
+- **HGR dithered colors (100-109) generate significantly more code**: A typical dithered text block produces 100-200+ lines of BASIC code versus the usual 50 lines for solid colors. This is due to the checkerboard pattern requiring more granular HPLOT statements. Use dithering sparingly for small text or decorative elements where memory permits.
+- **GR mode does not support dithering**: With 16 solid colors available, dithering is not implemented in GR mode
 
 ## Version History
 
