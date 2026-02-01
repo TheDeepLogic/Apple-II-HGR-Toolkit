@@ -1,3 +1,5 @@
+![Apple II HGR/GR Toolkit](applesofthgrgrtoolkit_banner.jpeg)
+
 # Apple II HGR/GR Toolkit
 
 A Python-based code generator for creating Applesoft BASIC programs with HGR (High Resolution Graphics) and GR (Low Resolution Graphics) text effects for the Apple II computer.
