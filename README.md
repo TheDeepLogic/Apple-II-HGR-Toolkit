@@ -1,4 +1,4 @@
-![Apple II HGR/GR Toolkit](applesofthgrgrtoolkit_banner.jpeg)
+![Apple II HGR/GR Toolkit](images/applesofthgrgrtoolkit_banner.jpeg)
 
 # Apple II HGR/GR Toolkit
 
